@@ -24,7 +24,14 @@ La imagen de «Compartir resultado» y el texto que la acompaña llevan la direc
 
 La página copia el sistema visual de grupotrimodos.com, medido en la web en vivo: el mismo logotipo (`img/logo-trimodos.png`) y cabecera de 56 px, el mismo contenedor de Bootstrap (540, 720, 960, 1140 y 1320 px con 15 px de margen), Mulish 500 en los títulos y Roboto en el texto, y secciones a todo el ancho: blanco, crema `#FFEED4` para los datos y amarillo `#FCDA00` para el resultado. La referencia va en verde Stinsa y la realización en naranja Transargi.
 
-No hay enlaces a otras webs, ni pantalla de inicio animada, ni app instalable, ni modo oscuro. La información técnica está plegada: «Opciones avanzadas», «Evolución del precio del gasóleo» y «Cómo se calcula» (el cálculo con sus cifras, las semanas usadas, las tablas de C y la normativa).
+Debajo del resultado, en una banda gris, está la sección **«Normativa aplicable»**, siempre a la vista:
+
+- Una tarjeta por norma: Ley 15/2009, art. 38; Orden FOM/1882/2012, condición 3.4; Real Decreto-ley 9/2026 (desde el 16/04/2026) y Real Decreto-ley 18/2026 (desde el 01/07/2026).
+- Una cronología con lo que se aplica según la fecha del transporte. Se marca sola («Tu transporte») el periodo del cálculo, con las mismas fechas que usa el cálculo.
+- El aviso legal destacado.
+- La fuente de los precios, con la última semana publicada.
+
+No hay enlaces a otras webs, ni pantalla de inicio animada, ni app instalable, ni modo oscuro. La información técnica está plegada: «Opciones avanzadas», «Evolución del precio del gasóleo» y «Cómo se calcula» (el cálculo con sus cifras, los modos de precio, las semanas usadas y las tablas de C).
 
 ## Modo incrustado
 
@@ -112,7 +119,7 @@ Es el contenido de `odoo/bloque-calculadora.html`; se pega tal cual:
       // Saludo con el idioma: así la calculadora conoce el origen de la página aunque el navegador no envíe referrer
       try { f.contentWindow.postMessage({ type: "trimodos:lang", lang: lang }, origenDe(f)); } catch (e) {}
       // Si en 8 s no ha llegado ninguna altura (script bloqueado, red lenta…), se deja una altura que lo muestre todo
-      setTimeout(function () { if (!f.getAttribute("data-tt-alto")) f.style.height = "4200px"; }, 8000);
+      setTimeout(function () { if (!f.getAttribute("data-tt-alto")) f.style.height = "6500px"; }, 8000);
     });
   }
   marcos().forEach(iniciar);
@@ -141,7 +148,7 @@ Qué hace:
 
 - Toma el idioma de `<html lang>` de la página de Odoo (`en_US`, `en-US`… → inglés; el resto → español). La versión inglesa de la web (`/en/…`) muestra la calculadora en inglés sin traducir nada.
 - Solo acepta mensajes del origen de la calculadora (`https://grupo-trimodos.github.io`, sacado de `data-base`) y del propio iframe.
-- `trimodos:height` ajusta la altura (empieza en 1600 px, con `min-height` de 600 px para que no salte). Si en 8 s no llega ninguna altura, deja 4200 px para que se vea todo.
+- `trimodos:height` ajusta la altura (empieza en 1600 px, con `min-height` de 600 px para que no salte). Si en 8 s no llega ninguna altura, deja 6500 px para que se vea todo.
 - `trimodos:scrollTo` desplaza la ventana sumando la posición del iframe y restando la altura de la cabecera fija de Odoo (`header#top`).
 - El iframe no tiene barra de desplazamiento propia (`scrolling="no"`), se carga en diferido (`loading="lazy"`) y lleva `allow="clipboard-write; web-share"` para que «Compartir resultado» pueda copiar la imagen o abrir el menú de compartir del móvil.
 - Su estilo quita el contenedor y el relleno del bloque «Código incrustado» que lo contiene (con `:has(.tt-calc)`), para que la calculadora vaya a ancho completo aunque se olvide ajustarlo en el editor.
@@ -180,7 +187,7 @@ Resultado de la prueba (Chrome, 19/11/2026):
 
 - Un solo logotipo, un solo selector de idioma y un solo pie: los de la web. Dentro de la calculadora, 0.
 - El iframe ocupa todo el ancho (1280 de 1280 px) y la sección no deja relleno.
-- La altura sigue al contenido sin barra interna. A 1280 px: 1974 px; 2150 al abrir «Opciones avanzadas»; 3520 al abrir también «Cómo se calcula»; 3345 al cerrar la primera; 1974 al cerrar la segunda.
+- La altura sigue al contenido sin barra interna. A 1280 px: 3013 px; 3188 al abrir «Opciones avanzadas»; 4199 al abrir también «Cómo se calcula»; 4024 al cerrar la primera; 3013 al cerrar la segunda.
 - Con `<html lang="en-US">` la calculadora sale en inglés, y el mensaje `trimodos:lang` la cambia en caliente.
 - `trimodos:scrollTo` lleva la página justo al punto pedido, debajo de la cabecera fija.
 - Una página de otro origen no recibe ningún mensaje.

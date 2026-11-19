@@ -51,7 +51,7 @@
       // Saludo con el idioma: así la calculadora conoce el origen de la página aunque el navegador no envíe referrer
       try { f.contentWindow.postMessage({ type: "trimodos:lang", lang: lang }, origenDe(f)); } catch (e) {}
       // Si en 8 s no ha llegado ninguna altura (script bloqueado, red lenta…), se deja una altura que lo muestre todo
-      setTimeout(function () { if (!f.getAttribute("data-tt-alto")) f.style.height = "4200px"; }, 8000);
+      setTimeout(function () { if (!f.getAttribute("data-tt-alto")) f.style.height = "6500px"; }, 8000);
     });
   }
   marcos().forEach(iniciar);

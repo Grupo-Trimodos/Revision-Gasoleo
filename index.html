@@ -34,7 +34,7 @@
    campos con radio 0,4 rem, botones en píldora y secciones a todo el ancho: blanco, crema #FFEED4, amarillo #FCDA00
    y pie gris #F3F2F2. Referencia en verde Stinsa y realización en naranja Transargi, como en los titulares de la web. */
 :root{
-  --white:#ffffff; --cream:#ffeed4; --sun:#fcda00; --gray:#f3f2f2;
+  --white:#ffffff; --cream:#ffeed4; --sun:#fcda00; --sun-soft:#fff6bf; --sun-ink:#6f5a00; --gray:#f3f2f2;
   --ink:#212529; --ink-soft:#3b3a2a; --muted:#6c757d; --muted-2:#5c636a;
   --line:rgba(33,37,41,.12); --field-line:rgba(33,37,41,.3); --dark:#2d3142;
   --stinsa:#009e91; --stinsa-ink:#00756b; --transargi:#f17e49; --transargi-title:#d9622b; --transargi-ink:#a8461a; --intraser:#1e6bb8;
@@ -199,9 +199,57 @@ tr.in-ref td{background:var(--band-a)}
 tr.in-real td{background:var(--band-b)}
 .ctable{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:12px}
 .ctable table td,.ctable table th{text-align:left;white-space:normal}
-.refs{font:700 12px/1.5 var(--f-display);letter-spacing:.06em;text-transform:uppercase;color:var(--muted-2)}
-.legal{display:grid;gap:8px;font-size:14px;color:var(--muted);max-width:92ch}
-.legal b{color:var(--ink);font-weight:500}
+
+/* Normativa aplicable, sobre la banda gris de la web: tarjetas por norma, cronología según la fecha del
+   transporte (se marca la que corresponde al cálculo) y aviso legal destacado */
+.band-gray{background:var(--gray)}
+.law{padding-block:56px;display:grid;gap:36px}
+@media (max-width:767.98px){.law{padding-block:36px;gap:28px}}
+.h3{font-size:calc(1.325rem + .9vw)}
+@media (min-width:1200px){.h3{font-size:2rem}}
+.kick{font:700 13px/1 var(--f-display);letter-spacing:.14em;text-transform:uppercase;color:var(--muted-2)}
+.law-head{display:grid;gap:12px}
+.law-lead{font:300 1.125rem/1.55 var(--f-body);max-width:46em}
+.law-norms{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}
+@media (max-width:767.98px){.law-norms{grid-template-columns:1fr;gap:14px}}
+.law-card{background:var(--white);border-radius:var(--r-box);padding:24px;display:grid;grid-template-columns:48px minmax(0,1fr);gap:16px;align-items:start}
+.law-ico{width:48px;height:48px;border-radius:50%;background:var(--sun-soft);color:var(--sun-ink);display:grid;place-items:center;font:600 24px/1 var(--f-display)}
+@media (max-width:575.98px){.law-card{padding:20px 16px;grid-template-columns:40px minmax(0,1fr);gap:12px}.law-ico{width:40px;height:40px;font-size:20px}}
+.law-body{display:grid;gap:6px;min-width:0}
+.law-kind{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;font:700 12px/1.3 var(--f-display);letter-spacing:.1em;text-transform:uppercase;color:var(--muted-2)}
+.law-since{font:600 12px/1 var(--f-display);letter-spacing:0;text-transform:none;background:var(--sun);color:var(--ink);border-radius:var(--r-pill);padding:5px 10px}
+.law-name{font:600 19px/1.3 var(--f-display)}
+.law-sub{font-size:14px;color:var(--muted)}
+.law-txt{font-size:15px;line-height:1.6;margin-top:4px}
+.law-f{font-family:var(--f-mono);font-size:14px;white-space:nowrap;background:var(--gray);border-radius:4px;padding:1px 6px}
+.law-tl{display:grid;gap:18px}
+.law-h{font:600 20px/1.3 var(--f-display)}
+.law-time{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));position:relative}
+.law-time::before{content:"";position:absolute;left:8px;right:0;top:8px;height:2px;background:rgba(33,37,41,.18)}
+.law-time li{position:relative;padding:32px 20px 0 0;display:grid;gap:4px;align-content:start;color:var(--muted-2)}
+.law-time li::before{content:"";position:absolute;left:0;top:0;width:18px;height:18px;border-radius:50%;background:var(--white);border:2px solid rgba(33,37,41,.35);box-sizing:border-box}
+.law-when{font:600 16px/1.3 var(--f-display);color:var(--ink)}
+.law-what{font-size:15px;line-height:1.5}
+.law-norm{font-size:13px}
+.law-now{display:none;justify-self:start;margin-top:6px;font:700 11px/1 var(--f-display);letter-spacing:.08em;text-transform:uppercase;background:var(--ink);color:#fff;border-radius:var(--r-pill);padding:5px 10px}
+.law-time li.is-now{color:var(--ink)}
+.law-time li.is-now::before{background:var(--sun);border-color:var(--ink)}
+.law-time li.is-now .law-now{display:inline-block}
+@media (max-width:767.98px){
+  .law-time{grid-template-columns:1fr}
+  .law-time::before{left:8px;right:auto;top:6px;bottom:6px;width:2px;height:auto}
+  .law-time li{padding:0 0 22px 34px}
+  .law-time li:last-child{padding-bottom:0}
+}
+.law-gloss{font-size:14px;color:var(--muted-2)}
+.law-gloss b{font-weight:500;color:var(--ink)}
+.law-foot{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:20px 32px;align-items:start}
+@media (max-width:991.98px){.law-foot{grid-template-columns:1fr}}
+.law-notice{display:grid;grid-template-columns:32px minmax(0,1fr);gap:14px;align-items:start;background:var(--white);border-left:4px solid var(--sun);border-radius:var(--r-box);padding:20px 22px;font-size:15px;line-height:1.6}
+.law-nico{width:32px;height:32px;border-radius:50%;background:var(--ink);color:var(--sun);display:grid;place-items:center;font:700 16px/1 var(--f-display)}
+.law-nt{font:600 18px/1.3 var(--f-display)}
+.law-src{display:grid;gap:6px;padding-top:4px;font-size:15px;line-height:1.55}
+.law-src .law-sub b{color:var(--ink);font-weight:500}
 
 /* Pie, como el de la web */
 .foot{background:var(--gray)}
@@ -335,6 +383,79 @@ html.embedded .hero-in{padding-block:28px 32px}
     </div>
   </section>
 
+  <section class="band-gray" aria-labelledby="hLaw">
+    <div class="container law">
+      <header class="law-head">
+        <p class="kick" id="lawKick">Marco legal</p>
+        <h2 class="h3" id="hLaw">Normativa aplicable</h2>
+        <p class="law-lead" id="lawLead">La revisión del precio del transporte por la variación del gasóleo es obligatoria por ley. La calculadora aplica estas normas según la fecha en que se hizo el transporte.</p>
+      </header>
+
+      <div class="law-norms">
+        <article class="law-card" aria-labelledby="n1t">
+          <span class="law-ico" aria-hidden="true">§</span>
+          <div class="law-body">
+            <p class="law-kind" id="n1k">Ley</p>
+            <h3 class="law-name" id="n1t">Ley 15/2009, artículo 38</h3>
+            <p class="law-sub" id="n1s">Contrato de transporte terrestre de mercancías</p>
+            <p class="law-txt" id="n1d">Obliga a revisar el precio del transporte por carretera cuando el gasóleo varía un 5 % o más (o el umbral menor pactado por escrito) entre la fecha del contrato y la del transporte. En los contratos continuados se revisa en cada facturación. No pueden computarse las bonificaciones extraordinarias del gasóleo.</p>
+          </div>
+        </article>
+        <article class="law-card" aria-labelledby="n2t">
+          <span class="law-ico" aria-hidden="true">§</span>
+          <div class="law-body">
+            <p class="law-kind" id="n2k">Orden ministerial</p>
+            <h3 class="law-name" id="n2t">Orden FOM/1882/2012, condición 3.4</h3>
+            <p class="law-sub" id="n2s">Condiciones generales de contratación del transporte de mercancías por carretera</p>
+            <p class="law-txt" id="n2d">Fija la fórmula de la revisión: <span class="law-f">ΔP = G × P × C / 100</span>. G es la variación del precio del gasóleo, P el precio pactado del transporte y C un coeficiente que depende del tipo de vehículo.</p>
+          </div>
+        </article>
+        <article class="law-card" aria-labelledby="n3t">
+          <span class="law-ico" aria-hidden="true">§</span>
+          <div class="law-body">
+            <p class="law-kind"><span id="n3k">Real Decreto-ley</span> <span class="law-since" id="n3v">Desde el 16/04/2026</span></p>
+            <h3 class="law-name" id="n3t">Real Decreto-ley 9/2026</h3>
+            <p class="law-txt" id="n3d">Da nueva redacción a la condición 3.4: la variación del gasóleo (G) se calcula con el Pmed y el coeficiente C pasa a depender del precio antes de impuestos (PAI) en la fecha del transporte.</p>
+          </div>
+        </article>
+        <article class="law-card" aria-labelledby="n4t">
+          <span class="law-ico" aria-hidden="true">§</span>
+          <div class="law-body">
+            <p class="law-kind"><span id="n4k">Real Decreto-ley</span> <span class="law-since" id="n4v">Desde el 01/07/2026</span></p>
+            <h3 class="law-name" id="n4t">Real Decreto-ley 18/2026</h3>
+            <p class="law-txt" id="n4d">Cambia el precio de referencia y los umbrales que fijan el coeficiente C, que pasa a depender del Pmed en la fecha del transporte. El Ministerio lo detalla en su nota metodológica de 3 de julio de 2026.</p>
+          </div>
+        </article>
+      </div>
+
+      <div class="law-tl">
+        <h3 class="law-h" id="tlT">Qué se aplica según la fecha del transporte</h3>
+        <ol class="law-time">
+          <li><span class="law-when" id="t0w">Hasta el 21/03/2026</span><span class="law-what" id="t0d">G con el PVP · C fijo por vehículo</span><span class="law-norm" id="t0n">C: A 0,30 · B 0,20 · C 0,20 · D 0,10</span><span class="law-now">Tu transporte</span></li>
+          <li><span class="law-when" id="t1w">Del 22/03 al 15/04/2026</span><span class="law-what" id="t1d">G con el PAI · C fijo por vehículo</span><span class="law-norm" id="t1n">C: A 0,30 · B 0,20 · C 0,20 · D 0,10</span><span class="law-now">Tu transporte</span></li>
+          <li><span class="law-when" id="t2w">Del 16/04 al 30/06/2026</span><span class="law-what" id="t2d">G con el Pmed · C según el PAI</span><span class="law-norm" id="t2n">Real Decreto-ley 9/2026</span><span class="law-now">Tu transporte</span></li>
+          <li><span class="law-when" id="t3w">Desde el 01/07/2026</span><span class="law-what" id="t3d">G con el Pmed · C según el Pmed</span><span class="law-norm" id="t3n">Real Decreto-ley 18/2026</span><span class="law-now">Tu transporte</span></li>
+        </ol>
+        <p class="law-gloss" id="tlGloss"><b>PVP:</b> precio en surtidor · <b>PAI:</b> precio antes de impuestos · <b>Pmed:</b> PVP sin IVA y, para MMA ≥ 7,5 t, sin la devolución del gasóleo profesional.</p>
+      </div>
+
+      <div class="law-foot">
+        <div class="law-notice" role="note" aria-labelledby="ntT">
+          <span class="law-nico" aria-hidden="true">!</span>
+          <div class="law-body">
+            <p class="law-nt" id="ntT">Resultado orientativo</p>
+            <p id="ntD">El resultado depende de los datos introducidos y Grupo Trimodos no se hace responsable de las decisiones que se tomen a partir de él. Para una reclamación o un litigio, contrástalo con la calculadora oficial del Ministerio de Transportes y Movilidad Sostenible.</p>
+          </div>
+        </div>
+        <div class="law-src">
+          <p class="law-kind" id="srcK">Fuente de los precios</p>
+          <p id="srcD">Ministerio de Transportes y Movilidad Sostenible: evolución semanal del precio medio del gasóleo de automoción en España.</p>
+          <p class="law-sub"><span id="srcL">Última semana publicada:</span> <b id="srcDate">—</b></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="container more" aria-labelledby="hMore">
     <h2 class="sr-only" id="hMore">Más información</h2>
     <div class="acc">
@@ -389,9 +510,7 @@ html.embedded .hero-in{padding-block:28px 32px}
           <p id="howR">G se redondea al número de decimales elegido (redondeo aritmético: 5 o más sube) antes de multiplicarlo por C. Ese G redondeado es también el que se compara con el umbral.</p>
           <ul id="howL">
             <li><b>Manual:</b> el precio que escribas, en €/litro. <b>Día:</b> precio de la primera fecha publicada igual o posterior al día indicado. <b>Semana:</b> precio de la semana (de lunes a domingo) que contiene el día indicado. <b>Mes:</b> media simple de las semanas publicadas en ese mes. <b>Mes natural:</b> cada día del mes toma el precio de la primera semana publicada igual o posterior a ese día (como en «Día») y se hace la media de todos los días naturales del mes.</li>
-            <li><b>Precio para G (automático):</b> transporte desde el 16/04/2026, Pmed (PVP sin IVA y, para MMA ≥ 7,5 t, sin la devolución del gasóleo profesional); del 22/03 al 15/04/2026, PAI; antes, PVP.</li>
-            <li><b>Coeficiente C:</b> desde el 01/07/2026 (RDL 18/2026) según el Pmed del transporte; del 16/04 al 30/06/2026 (RDL 9/2026) según el PAI; antes, coeficiente fijo por vehículo. Si el transporte se indica por semana o por mes, se usa el mismo precio medio; con precio manual, ese precio.</li>
-            <li>La revisión es obligatoria cuando |G| ≥ 5 % o el umbral menor pactado por escrito, y siempre en los contratos continuados en cada periodo de facturación. No pueden computarse las bonificaciones extraordinarias del gasóleo.</li>
+            <li>El precio que se usa para G y para el coeficiente C depende de la fecha del transporte (ver «Normativa aplicable»). Si el transporte se indica por semana o por mes, C se calcula con el mismo precio medio; con precio manual, con ese precio.</li>
           </ul>
           <h3 id="howWeeksT">Semanas utilizadas</h3>
           <div class="tablebox"><table id="tbl"><thead><tr><th>Semana (lunes)</th><th>PVP</th><th>PVP sin IVA</th><th>Impuesto hidrocarburos</th><th>PAI</th><th>Devol. GP</th><th>Pmed ≥ 7,5 t</th><th>Pmed &lt; 7,5 t</th></tr></thead><tbody></tbody></table></div>
@@ -400,16 +519,8 @@ html.embedded .hero-in{padding-block:28px 32px}
             <table><thead><tr><th colspan="2" id="ct18T">RDL 18/2026 · Pmed (€/l)</th></tr></thead><tbody id="ct18"></tbody></table>
             <table><thead><tr><th colspan="2" id="ct9T">RDL 9/2026 · PAI (€/l)</th></tr></thead><tbody id="ct9"></tbody></table>
           </div>
-          <h3 id="howLawT">Normativa</h3>
-          <p class="refs" id="legalRefs">Ley 15/2009, art. 38 · Orden FOM/1882/2012, condición 3.4 · Real Decreto-ley 9/2026 · Real Decreto-ley 18/2026</p>
-          <p id="legalP1">El cálculo aplica la fórmula de la condición 3.4 de la Orden FOM/1882/2012, en la redacción del Real Decreto-ley 9/2026 y del Real Decreto-ley 18/2026, con las reglas del artículo 38 de la Ley 15/2009, del contrato de transporte terrestre de mercancías. Desde la entrada en vigor del RD-ley 18/2026, el 1 de julio de 2026, cambian el precio de referencia que se usa y los umbrales que fijan el coeficiente C (nota metodológica del Ministerio de 3/7/2026).</p>
         </div>
       </details>
-    </div>
-
-    <div class="legal">
-      <p id="legalShort"><b>Resultado orientativo.</b> Depende de los datos introducidos y Grupo Trimodos no se hace responsable de las decisiones que se tomen a partir de él. Para una reclamación o un litigio, contrástalo con la calculadora oficial del Ministerio de Transportes y Movilidad Sostenible.</p>
-      <p id="srcTxt">Precios: evolución semanal del gasóleo de automoción en España publicada por el Ministerio de Transportes y Movilidad Sostenible.</p>
     </div>
   </section>
 </main>
@@ -550,15 +661,30 @@ const STATIC_EN=[
  ["#detHowT","How it is calculated"],["#sumT","Your calculation"],["#lblBasis","Price used for G:"],
  ["#howF","ΔP = G × P × C / 100 &nbsp;·&nbsp; G = (P<sub>carriage</sub> − P<sub>reference</sub>) / P<sub>reference</sub> × 100"],
  ["#howR","G is rounded to the chosen number of decimal places (round half up) before being multiplied by C. That rounded G is also the one compared with the threshold."],
- ["#howL","<li><b>Manual:</b> the price you enter, in €/litre. <b>Day:</b> the price for the first published date on or after the chosen day. <b>Week:</b> the price for the week (Monday to Sunday) containing the chosen day. <b>Month:</b> simple average of the weeks published in that month. <b>Calendar month:</b> each day of the month takes the price of the first published week on or after that day (as in “Day”) and all calendar days of the month are averaged.</li><li><b>Price for G (automatic):</b> carriage from 16/04/2026, Pmed (pump price excl. VAT and, for MAM ≥ 7.5 t, excluding the professional diesel refund); from 22/03 to 15/04/2026, pre-tax price; earlier, pump price.</li><li><b>Coefficient C:</b> from 01/07/2026 (Royal Decree-law 18/2026) based on the Pmed at the time of carriage; from 16/04 to 30/06/2026 (Royal Decree-law 9/2026) based on the pre-tax price; earlier, a fixed coefficient per vehicle. If the carriage is entered by week or month, the same average price is used; with a manual price, that price.</li><li>Revision is mandatory when |G| ≥ 5% or a lower threshold agreed in writing, and always in continuous contracts at each billing period. Extraordinary diesel subsidies may not be taken into account.</li>"],
+ ["#howL","<li><b>Manual:</b> the price you enter, in €/litre. <b>Day:</b> the price for the first published date on or after the chosen day. <b>Week:</b> the price for the week (Monday to Sunday) containing the chosen day. <b>Month:</b> simple average of the weeks published in that month. <b>Calendar month:</b> each day of the month takes the price of the first published week on or after that day (as in “Day”) and all calendar days of the month are averaged.</li><li>The price used for G and for coefficient C depends on the date of carriage (see “Applicable legislation”). If the carriage is entered by week or month, C is calculated with the same average price; with a manual price, with that price.</li>"],
  ["#howWeeksT","Weeks used"],
  ["#tbl thead","<tr><th>Week (Monday)</th><th>Pump price</th><th>Excl. VAT</th><th>Hydrocarbon tax</th><th>Pre-tax (PAI)</th><th>Prof. refund</th><th>Pmed ≥ 7.5 t</th><th>Pmed &lt; 7.5 t</th></tr>"],
  ["#howCT","Coefficient C tables"],["#ct18T","RDL 18/2026 · Pmed (€/l)"],["#ct9T","RDL 9/2026 · Pre-tax price (€/l)"],
- ["#howLawT","Legislation"],
- ["#legalRefs","Law 15/2009, art. 38 · Order FOM/1882/2012, condition 3.4 · Royal Decree-law 9/2026 · Royal Decree-law 18/2026"],
- ["#legalP1","The calculation applies the formula in condition 3.4 of Order FOM/1882/2012, as amended by Royal Decree-law 9/2026 and Royal Decree-law 18/2026, under the rules of article 38 of Law 15/2009 on contracts for the carriage of goods by land. Since Royal Decree-law 18/2026 came into force on 1 July 2026, the reference price used and the thresholds that set coefficient C have changed (Ministry methodological note of 3/7/2026)."],
- ["#legalShort","<b>For guidance only.</b> The result depends on the data entered and Grupo Trimodos accepts no liability for decisions taken on the basis of it. For a claim or dispute, check it against the official calculator of the Spanish Ministry of Transport and Sustainable Mobility."],
- ["#srcTxt","Prices: weekly automotive diesel prices in Spain published by the Spanish Ministry of Transport and Sustainable Mobility."],
+ ["#lawKick","Legal framework"],["#hLaw","Applicable legislation"],
+ ["#lawLead","Revising the haulage price when the price of diesel changes is required by law. The calculator applies these rules according to the date of carriage."],
+ ["#n1k","Law"],["#n1t","Law 15/2009, article 38"],["#n1s","Contracts for the carriage of goods by land"],
+ ["#n1d","Requires the price of road haulage to be revised when diesel changes by 5% or more (or a lower threshold agreed in writing) between the contract date and the date of carriage. In continuous contracts it is revised at each billing period. Extraordinary diesel subsidies may not be taken into account."],
+ ["#n2k","Ministerial order"],["#n2t","Order FOM/1882/2012, condition 3.4"],["#n2s","General conditions for contracting the carriage of goods by road"],
+ ["#n2d","Sets the revision formula: <span class=\"law-f\">ΔP = G × P × C / 100</span>. G is the change in the diesel price, P the agreed haulage price and C a coefficient that depends on the type of vehicle."],
+ ["#n3k","Royal Decree-law"],["#n3v","From 16/04/2026"],["#n3t","Royal Decree-law 9/2026"],
+ ["#n3d","Rewords condition 3.4: the change in diesel price (G) is calculated with Pmed, and coefficient C depends on the pre-tax price (PAI) on the date of carriage."],
+ ["#n4k","Royal Decree-law"],["#n4v","From 01/07/2026"],["#n4t","Royal Decree-law 18/2026"],
+ ["#n4d","Changes the reference price and the thresholds that set coefficient C, which now depends on Pmed on the date of carriage. The Ministry explains it in its methodological note of 3 July 2026."],
+ ["#tlT","What applies by date of carriage"],
+ ["#t0w","Until 21/03/2026"],["#t0d","G with pump price · fixed C per vehicle"],["#t0n","C: A 0.30 · B 0.20 · C 0.20 · D 0.10"],
+ ["#t1w","22/03 to 15/04/2026"],["#t1d","G with pre-tax price · fixed C per vehicle"],["#t1n","C: A 0.30 · B 0.20 · C 0.20 · D 0.10"],
+ ["#t2w","16/04 to 30/06/2026"],["#t2d","G with Pmed · C based on pre-tax price"],["#t2n","Royal Decree-law 9/2026"],
+ ["#t3w","From 01/07/2026"],["#t3d","G with Pmed · C based on Pmed"],["#t3n","Royal Decree-law 18/2026"],
+ [".law-now","Your carriage"],
+ ["#tlGloss","<b>PVP:</b> pump price · <b>PAI:</b> pre-tax price · <b>Pmed:</b> pump price excl. VAT and, for MAM ≥ 7.5 t, excluding the professional diesel refund."],
+ ["#ntT","For guidance only"],
+ ["#ntD","The result depends on the data entered and Grupo Trimodos accepts no liability for decisions taken on the basis of it. For a claim or dispute, check it against the official calculator of the Spanish Ministry of Transport and Sustainable Mobility."],
+ ["#srcK","Source of prices"],["#srcD","Spanish Ministry of Transport and Sustainable Mobility: weekly average price of automotive diesel in Spain."],["#srcL","Latest week published:"],
  ["#fAbout","We are a transport and logistics company specialising in intermodal transport. After more than 40 years of experience, we keep working towards the same goal: helping businesses optimise their logistics networks efficiently, closely and honestly."],
  ["#fTalkT","Let’s talk"]
 ];
@@ -801,6 +927,9 @@ function calc(){
   $("basisHint").textContent=S.basis==="auto"?L.hintAuto(BN(basis)):L.hintMan(BN(basis));
   $("lgSeries").textContent=L.weekly(BN(basis));
   LAST={basis,ge,wr,wt,rv:r.v,tv:t.v,G,gd,C,cNote,pct,dP,np:dP==null?null:S.price+dP,verdict:vt,verdictOk:vc==="ok"};
+  // Normativa aplicable: se marca el periodo que corresponde a la fecha del transporte (mismas fechas que el cálculo)
+  const per=!isFinite(tEnd)?-1:tEnd>=D_RDL18?3:tEnd>=D_RDL9?2:tEnd>=D_RDL7?1:0;
+  document.querySelectorAll(".law-time li").forEach((li,i)=>li.classList.toggle("is-now",i===per));
   // Resumen para lectores de pantalla, sin anunciar cada pulsación
   clearTimeout(liveT);liveT=setTimeout(()=>{$("rLive").textContent=pct==null?vt[0]+". "+vt[1]:L.live($("rPct").textContent,$("rDP").textContent,vt[0])},700);
   drawChart();drawTable();
@@ -852,7 +981,7 @@ function drawCTables(){
 
 // ---- Fecha de los datos ----
 function renderStatus(){
-  $("stLast").textContent=fmtDate(lastRow().ms);
+  $("stLast").textContent=fmtDate(lastRow().ms);$("srcDate").textContent=fmtDate(lastRow().ms);
   // El Ministerio publica una vez por semana. Si han pasado más de 17 días desde la última semana con precio,
   // se avisa de forma neutra.
   const msg=$("stMsg");
