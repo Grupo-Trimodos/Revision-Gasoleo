@@ -24,14 +24,9 @@ La imagen de «Compartir resultado» y el texto que la acompaña llevan la direc
 
 La página copia el sistema visual de grupotrimodos.com, medido en la web en vivo: el mismo logotipo (`img/logo-trimodos.png`) y cabecera de 56 px, el mismo contenedor de Bootstrap (540, 720, 960, 1140 y 1320 px con 15 px de margen), Mulish 500 en los títulos y Roboto en el texto, y secciones a todo el ancho: blanco, crema `#FFEED4` para los datos y amarillo `#FCDA00` para el resultado. La referencia va en verde Stinsa y la realización en naranja Transargi.
 
-Debajo del resultado, en una banda gris, está la sección **«Normativa aplicable»**, siempre a la vista:
+Al final de la página, siempre a la vista y en letra pequeña, están la normativa aplicable (Ley 15/2009, art. 38; Orden FOM/1882/2012, condición 3.4; Real Decreto-ley 9/2026 y Real Decreto-ley 18/2026), el aviso de resultado orientativo y la fuente de los precios.
 
-- Una tarjeta por norma: Ley 15/2009, art. 38; Orden FOM/1882/2012, condición 3.4; Real Decreto-ley 9/2026 (desde el 16/04/2026) y Real Decreto-ley 18/2026 (desde el 01/07/2026).
-- Una cronología con lo que se aplica según la fecha del transporte. Se marca sola («Tu transporte») el periodo del cálculo, con las mismas fechas que usa el cálculo.
-- El aviso legal destacado.
-- La fuente de los precios, con la última semana publicada.
-
-No hay enlaces a otras webs, ni pantalla de inicio animada, ni app instalable, ni modo oscuro. La información técnica está plegada: «Opciones avanzadas», «Evolución del precio del gasóleo» y «Cómo se calcula» (el cálculo con sus cifras, los modos de precio, las semanas usadas y las tablas de C).
+No hay enlaces a otras webs, ni pantalla de inicio animada, ni app instalable, ni modo oscuro. La información técnica está plegada: «Opciones avanzadas», «Evolución del precio del gasóleo» y «Cómo se calcula» (el cálculo con sus cifras, el método, las semanas usadas y las tablas de C).
 
 ## Modo incrustado
 
@@ -187,7 +182,7 @@ Resultado de la prueba (Chrome, 19/11/2026):
 
 - Un solo logotipo, un solo selector de idioma y un solo pie: los de la web. Dentro de la calculadora, 0.
 - El iframe ocupa todo el ancho (1280 de 1280 px) y la sección no deja relleno.
-- La altura sigue al contenido sin barra interna. A 1280 px: 3013 px; 3188 al abrir «Opciones avanzadas»; 4199 al abrir también «Cómo se calcula»; 4024 al cerrar la primera; 3013 al cerrar la segunda.
+- La altura sigue al contenido sin barra interna. A 1280 px: 2024 px; 2200 al abrir «Opciones avanzadas»; 3347 al abrir también «Cómo se calcula»; 3171 al cerrar la primera; 2024 al cerrar la segunda.
 - Con `<html lang="en-US">` la calculadora sale en inglés, y el mensaje `trimodos:lang` la cambia en caliente.
 - `trimodos:scrollTo` lleva la página justo al punto pedido, debajo de la cabecera fija.
 - Una página de otro origen no recibe ningún mensaje.
