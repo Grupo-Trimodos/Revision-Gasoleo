@@ -21,6 +21,7 @@
  *   --tl-bg         fondo de la capa de carga
  *   --tl-fg         color del texto
  * Opciones del <script>: data-splash="off" (sin pantalla de inicio), data-wait="ready".
+ * También se quita la pantalla de inicio con <html data-splash="off"> (la calculadora lo pone en modo incrustado).
  */
 (function () {
   "use strict";
@@ -183,7 +184,8 @@
   }
   function ready() { isReady = true; closeSplash(); }
 
-  if (opt("splash") !== "off") {
+  // Sin pantalla de inicio con data-splash="off" en el <script> o en <html> (p. ej. cuando la página va dentro de un iframe)
+  if (opt("splash") !== "off" && document.documentElement.getAttribute("data-splash") !== "off") {
     css();
     // La primera vez de cada sesión se deja ver el logotipo entero (~2,7 s); después, solo lo que tarde en cargar.
     var first = true;
