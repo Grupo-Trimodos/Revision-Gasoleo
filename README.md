@@ -4,113 +4,56 @@ Calculadora gratuita de la revisión obligatoria del precio del transporte de me
 
 - Calcula G (variación del gasóleo), el coeficiente C según el tipo de vehículo y el importe a revisar (ΔP = G × P × C / 100).
 - Cada precio puede tomarse a mano, por día, por semana, por mes o por mes natural.
-- Permite elegir a cuántos decimales se redondea G antes de multiplicarlo por C (en «Opciones avanzadas»).
 - Los precios salen de la Excel semanal del Ministerio de Transportes y se actualizan solos.
 
-Es pública: la usan clientes desde la web corporativa, no solo el personal interno. No tiene contraseña ni ningún control de acceso, y `localStorage` solo guarda las preferencias del formulario (`gasoleo-calc`) y el idioma (`gasoleo-lang`).
+Es una herramienta pública para clientes, sin contraseña ni control de acceso. `localStorage` solo guarda las preferencias del formulario (`gasoleo-calc`) y el idioma (`gasoleo-lang`).
 
-## Dónde está publicada
+## Dirección
 
 - Calculadora: <https://grupo-trimodos.github.io/Revision-Gasoleo/>
+- En inglés: <https://grupo-trimodos.github.io/Revision-Gasoleo/?lang=en>
 - Versión de pruebas: <https://grupo-trimodos.github.io/Revision-Gasoleo/pruebas/>
 - Versión ACTM: <https://grupo-trimodos.github.io/Revision-Gasoleo/actm/>
-- Página prevista en la web: <https://www.grupotrimodos.com/calculadora-gasoleo> (inglés: `/en/calculadora-gasoleo`). Esta dirección aparece en la imagen de «Compartir resultado», en el texto que se comparte y en la etiqueta `canonical`. Si la página de Odoo acaba con otra dirección, cámbiala en `PUBLIC_URL` (y `pubHost`) de `index.html`.
 
-## Modo incrustado (para la web de Odoo)
-
-La calculadora sigue alojada en GitHub Pages (así se actualiza sola) y se incrusta en una página de Odoo con un `<iframe>`. Se activa con `?embed=1` o automáticamente cuando la página está dentro de un iframe. En ese modo:
-
-- No muestra su cabecera ni su pie (los pone Odoo), ni la pantalla de inicio del logotipo. El loader solo aparece si los precios tardan en cargar.
-- Fondo transparente, sin márgenes laterales y siempre en tema claro.
-- No registra el *service worker* ni ofrece «Instalar app».
-- Envía su altura a la página padre con `postMessage` para que el iframe crezca o encoja sin barras de desplazamiento.
-- Los enlaces a grupotrimodos.com («Hablamos») se abren en la página completa; los externos (Ministerio), en una pestaña nueva.
-
-Parámetros de la URL:
-
-| Parámetro | Efecto |
-|---|---|
-| `embed=1` | Fuerza el modo incrustado. |
-| `lang=es` / `lang=en` | Idioma. En modo incrustado, si viene en la URL se oculta el selector ES/EN propio (la web ya tiene el suyo). |
-| `titulo=0` | Oculta el antetítulo, el título y la entradilla, para que la página de Odoo ponga los suyos como texto propio (mejor para el SEO). La fecha de los datos se sigue viendo. |
-
-### Fragmento para pegar en Odoo
-
-1. En la web, entra en la página (o créala: **Sitio web → + Nuevo → Página**, por ejemplo `calculadora-gasoleo`).
-2. **Editar** → pestaña **Bloques** → arrastra el bloque **«Código incrustado»** (*Embed Code*; en algunas versiones está en «Contenido» o se llama «HTML»).
-3. Pulsa **Editar código** en el bloque, borra el ejemplo y pega esto tal cual:
-
-```html
-<!-- Calculadora de revisión del precio del transporte por gasóleo (Grupo Trimodos) -->
-<iframe id="calculadora-gasoleo"
-  src="https://grupo-trimodos.github.io/Revision-Gasoleo/?embed=1&lang=es"
-  title="Calculadora de revisión del precio del transporte por gasóleo"
-  style="display:block;width:100%;height:2400px;border:0"
-  allow="clipboard-write; web-share"></iframe>
-<script>
-(function () {
-  var ORIGEN = "https://grupo-trimodos.github.io";
-  var f = document.getElementById("calculadora-gasoleo");
-  if (!f) return;
-  // El idioma de la página de Odoo (es-ES, en-GB…) decide el de la calculadora
-  var lang = /^en/i.test(document.documentElement.lang || "") ? "en" : "es";
-  var url = new URL(f.getAttribute("src"));
-  if (url.searchParams.get("lang") !== lang) { url.searchParams.set("lang", lang); f.src = url.href; }
-  // La calculadora envía su altura; solo se acepta desde su origen y desde ese iframe
-  window.addEventListener("message", function (e) {
-    if (e.origin !== ORIGEN || e.source !== f.contentWindow) return;
-    var d = e.data;
-    if (!d || d.source !== "trimodos-gasoleo" || d.type !== "height") return;
-    var h = Math.ceil(Number(d.height));
-    if (h > 300 && h < 20000) f.style.height = h + "px";
-  });
-  f.addEventListener("load", function () {
-    f.contentWindow.postMessage({ source: "trimodos-gasoleo", type: "hello" }, ORIGEN);
-  });
-})();
-</script>
-```
-
-4. **Guardar** y comprobar la página fuera del editor (en el editor de Odoo los scripts no siempre se ejecutan, así que ahí el iframe puede verse con altura fija).
-5. Para la versión en inglés no hace falta otro fragmento: el script lee el idioma de la página y pide `lang=en`.
-
-Notas:
-
-- `allow="clipboard-write; web-share"` hace falta para que «Compartir resultado» pueda copiar la imagen o abrir el menú de compartir del móvil desde dentro del iframe.
-- La altura de 2400 px es solo el valor inicial: si el script no llegara a ejecutarse, la calculadora se vería entera con su propia barra de desplazamiento.
-- Seguridad del `postMessage`, en los dos sentidos: la página de Odoo solo acepta mensajes de `https://grupo-trimodos.github.io` que vengan de ese iframe, y la calculadora solo envía su altura a `https://www.grupotrimodos.com`, `https://grupotrimodos.com` y, para pruebas, `http://localhost` y `http://127.0.0.1` (constante `PARENT_OK` en `index.html`). Si la web se publica en otro dominio (por ejemplo `*.odoo.com`) o la calculadora pasa a un dominio propio, hay que actualizar `PARENT_OK` y `ORIGEN`.
-- El contenido del iframe no cuenta para el SEO de la página de Odoo. Pon en Odoo el título de la página, la meta descripción (**Promocionar → Optimizar SEO**) y, si quieres, el título y un texto introductorio propios con `&titulo=0` en el `src`.
+La web corporativa (www.grupotrimodos.com, en Odoo) enlaza a la calculadora con un botón. Desde la versión en inglés de la web conviene enlazar la dirección con `?lang=en`.
 
 ## Diseño
 
-Sigue el sistema visual de grupotrimodos.com: Mulish (títulos, peso 500–600), Roboto 16 px (texto), IBM Plex Mono solo en cifras, fondo blanco con secciones en `#F3F2F2`, texto `#212529`/`#6C757D`, resultado en `#2D3142` con rótulos amarillos, botón principal sólido con radio 0,4 rem y botones secundarios en píldora. La referencia va en verde Stinsa y la realización en naranja Transargi (para el texto de las etiquetas se usan tonos oscurecidos que cumplen el contraste AA). En la página independiente hay modo oscuro; en el iframe, no.
+La página copia el sistema visual de grupotrimodos.com, medido en la web en vivo, para que al pulsar el botón no se note el cambio de sitio:
 
-### Decisión pendiente: el color morado de los botones
+- La misma cabecera: blanca, de 56 px, con el logotipo de la web (`img/logo-trimodos.png`) a 40 px y en la misma posición.
+- El mismo contenedor de Bootstrap (540, 720, 960, 1140 y 1320 px, con 15 px de margen).
+- Las mismas tipografías: Mulish 500 en los títulos (H1 de 48 px que escala en el móvil), Roboto 16 px en el texto y Roboto 300 en la entradilla.
+- Secciones a todo el ancho como las de la web: blanco, crema `#FFEED4` para los datos y amarillo `#FCDA00` para el resultado. El pie es gris `#F3F2F2`, con los mismos textos de contacto que la web.
+- Botones en píldora y la referencia en verde Stinsa y la realización en naranja Transargi, como los titulares de la web.
 
-Los botones de la web («Contacto», «Contáctanos») usan `#714B67`, que es el color por defecto de los temas de Odoo y no aparece en ningún logotipo del grupo. Para que la calculadora coincida con la web, el botón «Hablamos» y los enlaces lo usan, pero está en una sola variable:
+La página no enlaza a ninguna otra web: no hay botones de «volver», ni de contacto, ni enlaces externos. El correo comercial del pie se puede copiar, pero no abre nada. Tampoco hay pantalla de inicio animada, ni «Instalar app», ni modo oscuro (la web no lo tiene).
 
-```css
---accent:#714b67; --accent-hover:#5f3f57; --link:#714b67; --focus:#714b67;
-```
+La información técnica está plegada para no distraer: «Opciones avanzadas» (precio para G, umbral, redondeo y C a mano), «Evolución del precio del gasóleo» (gráfica) y «Cómo se calcula» (el cálculo con sus cifras, el método, las semanas usadas, las tablas de C y la normativa).
 
-Si se decide que no es intencionado y se cambia en el tema de Odoo, basta con cambiar esas variables en `:root` (`index.html` y `pruebas/index.html`). Cualquier color oscuro con contraste de 4,5:1 o más con el blanco sirve (por ejemplo `#2D3142`).
+Al compartir el enlace (WhatsApp, LinkedIn, correo) se muestra la vista previa `img/og-gasoleo.png`.
+
+## Publicación
+
+`.github/workflows/publicar.yml` publica la web en GitHub Pages en cada cambio de `main` y cuando termina la actualización de precios. Este repositorio es un *fork* de `Elomarmu/Revision-Gasoleo`, y GitHub desactiva las Actions en los forks. Para que funcione hay que hacer esto una vez:
+
+1. **Actions** → «I understand my workflows, go ahead and enable them».
+2. **Settings → Pages → Build and deployment → Source: GitHub Actions**. El repositorio es público, así que la web también lo es.
+3. **Actions** → «Publicar la calculadora» → **Run workflow**.
 
 ## Cómo se actualizan los datos
 
-`.github/workflows/actualizar.yml` ejecuta `scripts/actualizar.py` cada 2 horas de miércoles a viernes. El script busca en la página del Ministerio el enlace a la última Excel, la descarga, lee las hojas «PRECIOS_DEL_GASOLEO» y «PRECIOS DE REFERENCIA» y, si hay cambios, guarda `data.json`. `.github/workflows/publicar.yml` publica la web en GitHub Pages en cada cambio de `main` y cuando termina la actualización de precios.
-
-Requisitos en este repositorio (es un *fork* de `Elomarmu/Revision-Gasoleo`, y GitHub desactiva las Actions en los forks):
-
-1. **Actions** → «I understand my workflows, go ahead and enable them».
-2. **Settings → Pages → Build and deployment → Source: GitHub Actions**. El repositorio es público, así que la web también lo es para cualquiera.
+`.github/workflows/actualizar.yml` ejecuta `scripts/actualizar.py` cada 2 horas de miércoles a viernes. El script busca en la página del Ministerio el enlace a la última Excel, la descarga, lee las hojas «PRECIOS_DEL_GASOLEO» y «PRECIOS DE REFERENCIA» y, si hay cambios, guarda `data.json`.
 
 Para forzar una actualización: pestaña **Actions** → «Actualizar precios del gasóleo» → **Run workflow**.
-
-Los logotipos de `img/` son los de la app DECA Trimodos.
 
 ## Formato de data.json
 
 Cada fila de `rows` es `[fecha (serial Excel), PVP, PVP sin IVA, impuesto hidrocarburos, PAI, devolución gasóleo profesional, Pmed MMA ≥ 7,5 t, Pmed MMA < 7,5 t]`, en €/litro.
+
+## Versión de pruebas
+
+`pruebas/index.html` es una copia de `index.html` con la banda «VERSIÓN DE PRUEBAS», las rutas a `../`, `noindex` y su propia clave de `localStorage` (`gasoleo-calc-pruebas`).
 
 ## Aviso
 

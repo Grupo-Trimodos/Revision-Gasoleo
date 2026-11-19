@@ -3,502 +3,423 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<script>
-// Modo incrustado (?embed=1 o dentro de un iframe, p. ej. en la página de Odoo de grupotrimodos.com):
-// sin cabecera ni pie propios, sin pantalla de inicio, siempre en tema claro y sin app instalable.
-(function(){
-  var d=document.documentElement,q=new URLSearchParams(location.search),e=q.get("embed")==="1";
-  try{e=e||window.self!==window.top}catch(x){e=true}
-  if(e){d.setAttribute("data-embed","");d.setAttribute("data-theme","light");d.setAttribute("data-splash","off");if(/^(es|en)$/.test(q.get("lang")||""))d.setAttribute("data-lang-fixed","");
-    // ?titulo=0: sin antetítulo, título ni entradilla, para que la página de Odoo ponga los suyos (mejor para el SEO)
-    if(q.get("titulo")==="0")d.setAttribute("data-notitle","")}
-})();
-</script>
 <title>PRUEBAS · Calculadora de revisión por gasóleo</title>
 <meta name="description" content="Calcula la revisión obligatoria del precio del transporte por carretera cuando varía el precio del gasóleo (Ley 15/2009, art. 38), con los precios semanales oficiales del Ministerio de Transportes.">
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#ffffff">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Gasóleo">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="color-scheme" content="light">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Grupo Trimodos">
+<meta property="og:title" content="Calculadora de revisión del precio del transporte por gasóleo">
+<meta property="og:description" content="Calcula cuánto debe cambiar el precio de un transporte cuando varía el gasóleo, con los precios oficiales del Ministerio de Transportes.">
+<meta property="og:url" content="https://grupo-trimodos.github.io/Revision-Gasoleo/">
+<meta property="og:image" content="https://grupo-trimodos.github.io/Revision-Gasoleo/img/og-gasoleo.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/png" href="../img/favicon.png">
 <link rel="apple-touch-icon" href="../img/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mulish:wght@500;600;700&family=Roboto:wght@300;400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-/* Sistema visual de grupotrimodos.com (Odoo): fondo blanco con secciones en gris #F3F2F2, títulos en Mulish 500-600,
-   texto en Roboto 16 px, oscuros #2D3142 / #111827, botón principal sólido con radio 0,4 rem y botones secundarios en píldora.
-   Referencia en verde Stinsa y realización en naranja Transargi; el resultado en #2D3142 con rótulos amarillos.
-   El color del botón principal está en --accent (#714B67, el morado de los botones de la web): cambiarlo es una línea. */
-:root{--tl-ink:var(--ink);--tl-splash-bg:var(--bg);--tl-fg:var(--ink);--tl-bg:rgba(255,255,255,.9);
-  --bg:#ffffff; --surface:#ffffff; --sunk:#f3f2f2; --field:#ffffff;
-  --ink:#212529; --muted:#6c757d; --muted-sunk:#5c636a; --line:#dee2e6; --line-strong:#ced4da;
-  --dark:#2d3142; --dark-2:#111827;
-  --accent:#714b67; --accent-hover:#5f3f57; --accent-ink:#ffffff; --link:#714b67; --focus:#714b67;
-  --sun:#fddb00; --sun-soft:#fff3a3;
-  --stinsa:#009e91; --stinsa-ink:#00756b; --stinsa-soft:#e3f4f2;
-  --transargi:#f17e49; --transargi-ink:#a8461a; --transargi-soft:#fdeee6;
-  --band-a:rgba(0,158,145,.15); --band-b:rgba(241,126,73,.2); --chart:#2d3142;
-  --seg-on:#2d3142; --seg-on-ink:#ffffff;
-  --res-bg:#2d3142; --res-ink:#ffffff; --res-muted:#c5c9d6; --res-line:rgba(255,255,255,.16);
+/* Mismo sistema visual que www.grupotrimodos.com (Odoo + Bootstrap 5), medido en la web en vivo:
+   contenedor 540/720/960/1140/1320 px con 15 px de margen, cabecera blanca de 56 px con el logotipo a 40 px,
+   títulos en Mulish 500 (H1 de 48 px que escala en el móvil), texto en Roboto 16 px, entradilla en Roboto 300,
+   campos con radio 0,4 rem, botones en píldora y secciones a todo el ancho: blanco, crema #FFEED4, amarillo #FCDA00
+   y pie gris #F3F2F2. Referencia en verde Stinsa y realización en naranja Transargi, como en los titulares de la web. */
+:root{
+  --white:#ffffff; --cream:#ffeed4; --sun:#fcda00; --gray:#f3f2f2;
+  --ink:#212529; --ink-soft:#3b3a2a; --muted:#6c757d; --muted-2:#5c636a;
+  --line:rgba(33,37,41,.12); --field-line:rgba(33,37,41,.3); --dark:#2d3142;
+  --stinsa:#009e91; --stinsa-ink:#00756b; --transargi:#f17e49; --transargi-title:#d9622b; --transargi-ink:#a8461a; --intraser:#1e6bb8;
+  --band-a:rgba(0,158,145,.15); --band-b:rgba(241,126,73,.2);
   --f-display:"Mulish",system-ui,-apple-system,"Segoe UI",sans-serif;
   --f-body:"Roboto",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
-  --r:8px; --r-btn:.4rem; --r-pill:100px; --shadow:0 1px 3px rgba(0,0,0,.1);
-  --wrap:1080px; --gut:max(16px,env(safe-area-inset-left,0px)); --gut-r:max(16px,env(safe-area-inset-right,0px));
+  --r-btn:.4rem; --r-pill:100px; --r-box:8px;
   color-scheme:light;
 }
-/* Modo oscuro solo en la página independiente (en el iframe de Odoo se fuerza el tema claro) */
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --bg:#111827; --surface:#1a2130; --sunk:#0c1220; --field:#111827;
-  --ink:#f1f3f5; --muted:#adb5bd; --muted-sunk:#adb5bd; --line:#2c3445; --line-strong:#3a4356;
-  --accent:#8a5c7e; --accent-hover:#9c6b8f; --link:#dcb5d1; --focus:#dcb5d1;
-  --stinsa-ink:#5fd3c6; --stinsa-soft:#173a3d; --transargi-ink:#f7a47c; --transargi-soft:#3d2a26;
-  --band-a:rgba(44,196,181,.18); --band-b:rgba(245,146,95,.22); --chart:#e9ecef;
-  --seg-on:#e9ecef; --seg-on-ink:#111827; --sun-soft:#3b3510;
-  --res-bg:#262b3d; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#111827; --surface:#1a2130; --sunk:#0c1220; --field:#111827;
-  --ink:#f1f3f5; --muted:#adb5bd; --muted-sunk:#adb5bd; --line:#2c3445; --line-strong:#3a4356;
-  --accent:#8a5c7e; --accent-hover:#9c6b8f; --link:#dcb5d1; --focus:#dcb5d1;
-  --stinsa-ink:#5fd3c6; --stinsa-soft:#173a3d; --transargi-ink:#f7a47c; --transargi-soft:#3d2a26;
-  --band-a:rgba(44,196,181,.18); --band-b:rgba(245,146,95,.22); --chart:#e9ecef;
-  --seg-on:#e9ecef; --seg-on-ink:#111827; --sun-soft:#3b3510;
-  --res-bg:#262b3d; color-scheme:dark}
-
 *{box-sizing:border-box}
 [hidden]{display:none!important}
-html{scroll-padding-top:72px;-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 var(--f-body);display:flow-root}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--white);color:var(--ink);font:400 16px/1.5 var(--f-body)}
 p{margin:0}
-a{color:var(--link)}
-a:hover{text-decoration-thickness:2px}
-h1,h2,h3{font-family:var(--f-display);font-weight:600;letter-spacing:-.01em;text-wrap:balance;margin:0;line-height:1.2}
-.num,.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+h1,h2,h3{font-family:var(--f-display);font-weight:500;line-height:1.2;margin:0;text-wrap:balance}
+h1{font-size:calc(1.425rem + 2.1vw)}
+.h4{font-size:calc(1.275rem + .3vw)}
+@media (min-width:1200px){h1{font-size:3rem}.h4{font-size:1.5rem}}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
-:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
-.skip{position:absolute;left:12px;top:-60px;z-index:60;background:var(--dark);color:#fff;padding:8px 14px;border-radius:var(--r-btn);text-decoration:none}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.skip{position:absolute;left:12px;top:-60px;z-index:60;background:var(--ink);color:#fff;padding:8px 14px;border-radius:var(--r-btn);text-decoration:none}
 .skip:focus{top:8px}
 
-/* Cabecera de la página independiente: como la de grupotrimodos.com (blanca, 56 px, sombra suave) */
-.site-head{position:sticky;top:0;z-index:40;height:56px;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.1)}
-.site-head-in{max-width:calc(var(--wrap) + 32px);height:100%;margin:0 auto;padding-left:var(--gut);padding-right:var(--gut-r);display:flex;align-items:center;justify-content:space-between;gap:12px}
-.logo{display:inline-flex;align-items:center;flex:none}
-.logo img{display:block;height:30px;width:auto}
-.logo .alt{font:600 17px var(--f-display);color:#212529;letter-spacing:.04em}
-.head-tools{display:flex;align-items:center;gap:10px}
-.btn-outline{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 14px;border:1px solid #dee2e6;border-radius:var(--r-btn);background:#fff;color:#495057;font:400 15px/1 var(--f-body);text-decoration:none;white-space:nowrap}
-.btn-outline:hover{border-color:#adb5bd;color:#212529}
-.btn-outline svg{width:16px;height:16px;flex:none}
-@media (max-width:560px){.btn-outline .back-txt{display:none}.btn-outline{width:36px;padding:0;justify-content:center}.logo img{height:26px}}
-.lang{display:inline-flex;border:1px solid #dee2e6;border-radius:var(--r-btn);overflow:hidden;height:36px;background:#fff}
-.lang button{border:0;background:#fff;color:#495057;font:500 14px/1 var(--f-body);padding:0 11px;height:100%;cursor:pointer;min-width:40px}
-.lang button+button{border-left:1px solid #dee2e6}
-.lang button[aria-pressed="true"]{background:#2d3142;color:#fff}
-.lang button:focus-visible{outline:2px solid #714b67;outline-offset:-2px}
+/* Contenedor de Bootstrap, con los mismos cortes que la web */
+.container{width:100%;margin-inline:auto;padding-left:max(15px,env(safe-area-inset-left,0px));padding-right:max(15px,env(safe-area-inset-right,0px))}
+@media (min-width:576px){.container{max-width:540px}}
+@media (min-width:768px){.container{max-width:720px}}
+@media (min-width:992px){.container{max-width:960px}}
+@media (min-width:1200px){.container{max-width:1140px}}
+@media (min-width:1400px){.container{max-width:1320px}}
 
-/* Contenido */
-.wrap{max-width:calc(var(--wrap) + 32px);margin:0 auto;padding:0 var(--gut-r) 56px var(--gut);display:grid;gap:20px}
-.wrap>*{min-width:0}
+/* Cabecera */
+.site-head{position:relative;z-index:5;background:var(--white);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.head-in{height:56px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.logo{display:block;flex:none}
+.logo img{display:block;height:40px;width:auto}
+.lang{display:inline-flex;height:38px;border:1px solid #dee2e6;border-radius:var(--r-btn);overflow:hidden;background:var(--white)}
+.lang button{border:0;background:var(--white);color:rgba(0,0,0,.65);font:400 16px/1 var(--f-display);padding:0 12px;min-width:44px;cursor:pointer}
+.lang button+button{border-left:1px solid #dee2e6}
+.lang button:hover{color:var(--ink)}
+.lang button[aria-pressed="true"]{background:var(--ink);color:#fff}
+.lang button:focus-visible{outline-offset:-3px}
 
 /* Encabezado con el semicírculo amarillo de la web */
-.hero{position:relative;overflow:hidden;padding:36px 0 8px;display:grid;gap:12px;isolation:isolate}
-.hero::before{content:"";position:absolute;z-index:-1;right:-150px;top:-230px;width:420px;height:420px;border-radius:50%;background:var(--sun)}
-.hero-text{display:grid;gap:12px;max-width:min(760px,calc(100% - 200px))}
-.eyebrow{display:flex;align-items:center;gap:10px;font:700 13px/1 var(--f-display);letter-spacing:.14em;text-transform:uppercase;color:var(--ink)}
-.eyebrow::before{content:"";width:28px;height:4px;border-radius:2px;background:var(--sun)}
-h1{font-size:clamp(30px,4.4vw,44px);font-weight:500;line-height:1.15}
-.lede{font-size:17px;color:var(--ink);max-width:66ch}
-.updated{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;font-size:14px;color:var(--muted)}
-.updated b{font:500 14px var(--f-mono);color:var(--ink)}
-.notice{font-size:14px;color:var(--ink);background:var(--sunk);border-left:4px solid var(--sun);padding:8px 12px;border-radius:0 6px 6px 0;max-width:72ch}
-.hero-lang{display:none;justify-self:start}
-@media (max-width:760px){
-  .hero{padding-top:28px}
-  .hero::before{right:-120px;top:-150px;width:240px;height:240px}
-  .hero-text{max-width:100%}
-  .hero h1{padding-right:56px}
-}
+.hero{position:relative;overflow:hidden;isolation:isolate}
+.hero::before{content:"";position:absolute;z-index:-1;right:-140px;top:-220px;width:420px;height:420px;border-radius:50%;background:var(--sun)}
+.hero-in{padding-block:48px 40px;display:grid;gap:16px}
+.hero h1{max-width:21em}
+.lead{font:300 1.25rem/1.5 var(--f-body);max-width:42em}
+.updated{font-size:15px;color:var(--muted)}
+.updated b{font-weight:500;color:var(--ink)}
+.notice{font-size:15px;background:var(--cream);border-radius:var(--r-btn);padding:10px 14px;max-width:72ch}
+@media (max-width:991.98px){.hero::before{right:-120px;top:-170px;width:300px;height:300px}.hero h1{padding-right:90px}}
+@media (max-width:575.98px){.hero::before{right:-110px;top:-140px;width:220px;height:220px}.hero h1{padding-right:44px}.hero-in{padding-block:36px 32px}}
 
-/* Tarjetas */
-.card,.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
-.panel{padding:20px;display:grid;gap:14px;align-content:start;position:relative;overflow:hidden}
-.panel::before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:var(--stinsa)}
-.panel.real::before{background:var(--transargi)}
-.panel header{display:grid;gap:6px;justify-items:start}
-.panel h2{font-size:22px}
-.help{font-size:14px;color:var(--muted)}
-.tag{display:inline-block;font:700 12px/1 var(--f-display);letter-spacing:.12em;text-transform:uppercase;padding:6px 8px;border-radius:4px}
-.tag.ref{background:var(--stinsa-soft);color:var(--stinsa-ink)}
-.tag.real{background:var(--transargi-soft);color:var(--transargi-ink)}
-.pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:20px}
-
+/* Datos del cálculo, sobre la banda crema */
+.band-cream{background:var(--cream)}
+.calc{padding-block:48px;display:grid;gap:24px}
+.pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:24px}
+@media (max-width:767.98px){.pair{grid-template-columns:1fr}.calc{padding-block:32px;gap:16px}.pair{gap:16px}}
+.box{background:var(--white);border-radius:var(--r-box);padding:24px;display:grid;gap:16px;align-content:start;min-width:0}
+@media (max-width:575.98px){.box{padding:20px 16px}}
+.box header{display:grid;gap:6px}
+.kicker{display:flex;align-items:center;gap:8px;font:700 13px/1 var(--f-display);letter-spacing:.12em;text-transform:uppercase;color:var(--muted-2)}
+.kicker::before{content:"";width:10px;height:10px;border-radius:50%;background:var(--stinsa)}
+.real .kicker::before{background:var(--transargi)}
+.panel h2{color:var(--stinsa)}
+.panel.real h2{color:var(--transargi-title)}
+.help{color:var(--muted);font-size:15px}
 .mode{display:grid;gap:6px}
-.lbl,.field label{font:500 14px/1.3 var(--f-body);color:var(--ink)}
-.seg{display:grid;grid-template-columns:repeat(5,1fr);border:1px solid var(--line-strong);border-radius:var(--r-btn);overflow:hidden;background:var(--surface)}
-.seg button{border:0;border-right:1px solid var(--line);border-radius:0;background:transparent;color:var(--ink);font:500 14px/1.15 var(--f-body);min-height:40px;padding:4px 2px;cursor:pointer;text-align:center}
+.seg{display:grid;grid-template-columns:repeat(5,1fr);border:1px solid var(--field-line);border-radius:var(--r-btn);overflow:hidden}
+.seg button{border:0;border-right:1px solid var(--line);background:var(--white);color:var(--ink);font:400 15px/1.15 var(--f-display);min-height:40px;padding:4px 2px;cursor:pointer;text-align:center}
 .seg button:last-child{border-right:0}
-.seg button:hover{background:var(--sunk)}
-.seg button[aria-pressed="true"]{background:var(--seg-on);color:var(--seg-on-ink)}
+.seg button:hover{background:var(--gray)}
+.seg button[aria-pressed="true"]{background:var(--dark);color:#fff;font-weight:600}
 .seg button:focus-visible{outline-offset:-3px}
-@media (max-width:400px){.seg button{font-size:13px}}
+@media (max-width:400px){.seg button{font-size:13.5px}}
+.fields{display:flex;flex-wrap:wrap;gap:16px}
+.field{display:grid;gap:6px;flex:1 1 200px;min-width:0}
+.lbl,.field label{font:400 16px/1.3 var(--f-body);color:var(--ink)}
+input,select{font:400 16px/1.5 var(--f-body);color:var(--ink);background:var(--white);border:1px solid var(--field-line);border-radius:var(--r-btn);padding:7px 12px;min-height:40px;width:100%;min-width:0}
+input:hover,select:hover{border-color:rgba(33,37,41,.5)}
+input:focus,select:focus{outline:0;border-color:var(--dark);box-shadow:0 0 0 .25rem rgba(45,49,66,.18)}
+.readout{display:flex;align-items:baseline;flex-wrap:wrap;gap:2px 10px;border-top:1px solid var(--line);padding-top:14px}
+.readout .big{font:600 30px/1.1 var(--f-display);font-variant-numeric:tabular-nums lining-nums}
+.readout .unit{color:var(--muted);font-size:15px}
+.readout .weeks{flex-basis:100%;font-size:14px;color:var(--muted);margin-top:4px}
+.checks{display:flex;flex-wrap:wrap;gap:10px 32px}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:16px;line-height:1.4;cursor:pointer}
+.check input{width:18px;height:18px;min-height:0;margin:2px 0 0;flex:none;accent-color:var(--dark)}
 
-.fields{display:flex;flex-wrap:wrap;gap:14px}
-.field{display:grid;gap:6px;flex:1 1 180px;min-width:0}
-input,select{font:400 16px/1.3 var(--f-body);color:var(--ink);background:var(--field);border:1px solid var(--line-strong);border-radius:var(--r-btn);padding:9px 12px;min-height:44px;width:100%;min-width:0}
-input[type=number]{font-family:var(--f-mono)}
-input:hover,select:hover{border-color:var(--muted)}
-input:focus-visible,select:focus-visible{outline:2px solid var(--focus);outline-offset:1px;border-color:var(--focus)}
-.readout{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 10px;border-top:1px dashed var(--line);padding-top:12px}
-.readout .big{font:500 28px/1.1 var(--f-mono)}
-.readout .unit{color:var(--muted);font-size:14px}
-.readout .weeks{flex-basis:100%;font-size:14px;color:var(--muted)}
-
-.settings{padding:20px;display:grid;gap:16px}
-.settings h2,.chart h2{font-size:22px}
-.checks{display:flex;flex-wrap:wrap;gap:10px 28px}
-.check{display:flex;gap:10px;align-items:flex-start;font-size:15px;line-height:1.4;cursor:pointer}
-.check input{width:18px;height:18px;min-height:0;margin:1px 0 0;flex:none;accent-color:var(--dark)}
-.hint{font-size:14px;color:var(--muted)}
-
-/* Resultado */
-.result{position:relative;overflow:hidden;isolation:isolate;background:var(--res-bg);color:var(--res-ink);border-radius:12px;padding:clamp(20px,3.2vw,36px);display:grid;gap:22px}
-.result::before{content:"";position:absolute;z-index:-1;right:-110px;bottom:-130px;width:280px;height:280px;border-radius:50%;border:22px solid rgba(253,219,0,.2)}
-@media (max-width:760px){.result::before{display:none}}
-.res-eyebrow{display:flex;align-items:center;gap:10px;font:700 13px/1 var(--f-display);letter-spacing:.14em;text-transform:uppercase;color:var(--sun)}
-.res-eyebrow::before{content:"";width:28px;height:4px;border-radius:2px;background:var(--sun)}
-.res-top{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:20px 40px;align-items:end}
+/* Resultado, sobre la banda amarilla */
+.band-sun{background:var(--sun);position:relative;overflow:hidden;isolation:isolate}
+.band-sun::before{content:"";position:absolute;z-index:-1;right:-140px;bottom:-260px;width:520px;height:520px;border-radius:50%;background:rgba(255,255,255,.3)}
+.res{padding-block:48px;display:grid;gap:24px}
+@media (max-width:767.98px){.res{padding-block:32px;gap:20px}.band-sun::before{display:none}}
+.res-kicker{font:700 13px/1 var(--f-display);letter-spacing:.14em;text-transform:uppercase}
+.res-top{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:20px 48px;align-items:end}
 .res-amounts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px 24px}
-.k{font:700 12.5px/1.35 var(--f-display);letter-spacing:.1em;text-transform:uppercase;color:var(--sun)}
-.v{font:600 clamp(28px,3.6vw,38px)/1.1 var(--f-display);font-variant-numeric:tabular-nums lining-nums;white-space:nowrap;margin-top:6px}
-.v.xl{font-size:clamp(46px,7.4vw,80px);font-weight:700;line-height:1;letter-spacing:-.02em}
-.s{font-size:14px;color:var(--res-muted);margin-top:4px}
-@media (max-width:760px){.res-top{grid-template-columns:1fr}}
-@media (max-width:440px){.res-amounts{grid-template-columns:1fr}}
-.verdict{display:flex;gap:12px;align-items:flex-start;border-radius:var(--r);padding:14px 16px;background:rgba(255,255,255,.1);color:#fff}
-.verdict .v-ico{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font:700 15px/1 var(--f-display);background:rgba(255,255,255,.18)}
-.verdict.ok{background:var(--sun);color:#2d3142}
-.verdict.ok .v-ico{background:#2d3142;color:var(--sun)}
+@media (max-width:991.98px){.res-top{grid-template-columns:1fr}}
+@media (max-width:420px){.res-amounts{grid-template-columns:1fr}}
+.k{font:700 13px/1.35 var(--f-display);letter-spacing:.08em;text-transform:uppercase}
+.v{font:600 clamp(30px,3.4vw,42px)/1.1 var(--f-display);font-variant-numeric:tabular-nums lining-nums;white-space:nowrap;margin-top:6px}
+.v.xl{font-size:clamp(50px,7.4vw,92px);line-height:1;letter-spacing:-.02em}
+.s{font-size:15px;color:var(--ink-soft);margin-top:4px}
+.verdict{display:flex;gap:12px;align-items:flex-start;border-radius:var(--r-box);padding:16px 18px;background:rgba(255,255,255,.75);color:var(--ink)}
+.verdict .v-ico{flex:none;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font:700 15px/1 var(--f-display);background:var(--ink);color:#fff}
+.verdict.ok{background:var(--dark);color:#fff}
+.verdict.ok .v-ico{background:var(--sun);color:var(--dark)}
 .verdict .v-txt{display:grid;gap:2px}
-.verdict .v-t{font:700 18px/1.3 var(--f-display)}
+.verdict .v-t{font:600 19px/1.3 var(--f-display)}
 .verdict .v-d{font-size:15px}
-.res-sec{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:16px 40px;margin:0;border-top:1px solid var(--res-line);padding-top:18px}
-.res-sec dt{font:700 12px/1.35 var(--f-display);letter-spacing:.1em;text-transform:uppercase;color:var(--sun)}
-.res-sec dd{margin:6px 0 0}
-.res-sec .v2{font:600 24px/1.1 var(--f-display);font-variant-numeric:tabular-nums lining-nums;white-space:nowrap}
-.res-sec .s{font-family:var(--f-mono);font-size:13px}
-.formula{font:400 13px/1.5 var(--f-mono);color:var(--res-muted);overflow-wrap:anywhere}
-.formula:empty{display:none}
-.res-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px 16px}
-.btn-pill{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:var(--r-pill);padding:9px 22px;font:500 16px/1.2 var(--f-body);cursor:pointer;text-decoration:none;border:1px solid transparent}
-.btn-pill.light{background:#fff;color:#2d3142;border-color:#fff}
-.btn-pill.light:hover{background:var(--sun);border-color:var(--sun)}
-.btn-pill svg{width:18px;height:18px;flex:none}
+.res-sec{display:flex;flex-wrap:wrap;gap:4px 10px;align-items:baseline;font-size:16px}
+.res-sec b{font:600 18px/1.2 var(--f-display);font-variant-numeric:tabular-nums lining-nums}
+.res-sec .sep{color:var(--ink-soft)}
+.res-sec .note{font-size:14px;color:var(--ink-soft)}
+@media (max-width:575.98px){.res-sec{column-gap:16px}.res-sec .sep{display:none}}
+.res-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px}
+.btn-pill{display:inline-flex;align-items:center;justify-content:center;gap:10px;border:0;border-radius:var(--r-pill);padding:10px 28px;background:var(--white);color:var(--ink);font:400 18px/1.2 var(--f-display);cursor:pointer}
+.btn-pill:hover{background:var(--ink);color:#fff}
 .btn-pill:disabled{opacity:.7;cursor:default}
-.result :focus-visible{outline-color:var(--sun)}
-.share-msg{font-size:14px;color:#fff;flex:1 1 260px}
+.btn-pill svg{width:18px;height:18px;flex:none}
+.share-msg{font-size:15px;flex:1 1 260px}
 .share-msg:empty{display:none}
-.share-msg a{color:var(--sun)}
-@media (max-width:520px){.res-actions .btn-pill{width:100%}}
+.share-msg button{font:inherit;background:none;border:0;padding:0;text-decoration:underline;cursor:pointer;color:inherit}
+@media (max-width:575.98px){.res-actions .btn-pill{width:100%}}
 
-/* Llamada a la acción comercial */
-.cta{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:14px 24px;background:var(--sunk);border-radius:12px;padding:22px 24px;position:relative;overflow:hidden;isolation:isolate}
-.cta::after{content:"";position:absolute;z-index:-1;left:-46px;bottom:-46px;width:92px;height:92px;border-radius:50%;background:var(--sun)}
-.cta>div{display:grid;gap:4px;padding-left:28px}
-.cta-t{font:600 21px/1.3 var(--f-display)}
-.cta-s{color:var(--muted-sunk);font-size:15px}
-.btn-primary{display:inline-flex;align-items:center;gap:8px;background:var(--accent);color:var(--accent-ink);border:1px solid var(--accent);border-radius:var(--r-btn);padding:8px 20px;font:500 16px/1.3 var(--f-body);text-decoration:none;white-space:nowrap}
-.btn-primary:hover{background:var(--accent-hover);border-color:var(--accent-hover);color:var(--accent-ink)}
-@media (max-width:520px){.cta>div{padding-left:16px}.cta .btn-primary{width:100%;justify-content:center}}
-
-/* Desplegables */
-details.card{padding:0}
-details.card>summary{list-style:none;cursor:pointer;display:flex;flex-wrap:wrap;align-items:center;gap:4px 12px;padding:16px 52px 16px 20px;position:relative;font:600 19px/1.3 var(--f-display);border-radius:var(--r)}
-details.card>summary::-webkit-details-marker{display:none}
-details.card>summary::after{content:"";position:absolute;right:22px;top:50%;width:9px;height:9px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:translateY(-70%) rotate(45deg);transition:transform .15s}
-details.card[open]>summary::after{transform:translateY(-30%) rotate(-135deg)}
-details.card>summary:hover{background:var(--sunk)}
-details.card>summary:focus-visible{outline-offset:-2px}
-.sum-hint{font:400 14px/1.3 var(--f-body);color:var(--muted)}
-.badge{font:500 12px/1 var(--f-body);background:var(--sun);color:#2d3142;border-radius:var(--r-pill);padding:4px 10px}
-.det-body{padding:4px 20px 20px;display:grid;gap:14px}
-
-/* Gráfica */
-.chart{padding:20px;display:grid;gap:10px}
-.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:14px;color:var(--muted)}
+/* Más información: desplegables planos */
+.more{padding-block:48px;display:grid;gap:36px}
+@media (max-width:767.98px){.more{padding-block:32px;gap:28px}}
+.acc{border-top:1px solid var(--line)}
+.acc>details{border-bottom:1px solid var(--line)}
+.acc summary{list-style:none;cursor:pointer;position:relative;padding:20px 44px 20px 0;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px;font:500 calc(1.275rem + .3vw)/1.3 var(--f-display)}
+@media (min-width:1200px){.acc summary{font-size:1.5rem}}
+.acc summary::-webkit-details-marker{display:none}
+.acc summary::after{content:"";position:absolute;right:8px;top:50%;width:10px;height:10px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:translateY(-75%) rotate(45deg);transition:transform .15s}
+.acc details[open]>summary::after{transform:translateY(-25%) rotate(-135deg)}
+.acc summary:focus-visible{outline-offset:-2px}
+.sum-hint{font:400 15px/1.4 var(--f-body);color:var(--muted)}
+.badge{font:600 12px/1 var(--f-display);background:var(--sun);color:var(--ink);border-radius:var(--r-pill);padding:5px 10px;align-self:center}
+.acc-body{padding:0 0 32px;display:grid;gap:16px;min-width:0}
+.hint{font-size:15px;color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:15px;color:var(--muted)}
 .legend i{display:inline-block;width:14px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
 .svgbox{overflow-x:auto}
-svg text{fill:var(--muted);font-family:var(--f-mono);font-size:11px}
-
-/* Tablas y notas */
-.tablebox{overflow:auto;max-height:min(420px,60vh);-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:var(--r)}
-[data-embed] .tablebox{max-height:420px}
-.tablebox thead th{position:sticky;top:0;background:var(--surface);z-index:1}
+svg text{fill:var(--muted);font-family:var(--f-body);font-size:12px}
+.notes{display:grid;gap:12px;max-width:80ch;min-width:0;overflow-wrap:anywhere}
+.notes h3{font:600 18px/1.3 var(--f-display);margin-top:8px}
+.notes ul{margin:0;padding-left:20px;display:grid;gap:8px}
+.calc-sum{background:var(--cream);border-radius:var(--r-box);padding:16px 18px;display:grid;gap:6px}
+.calc-sum .mono{font-size:14px}
+.tablebox{overflow:auto;max-height:420px;-webkit-overflow-scrolling:touch;border:1px solid var(--line);border-radius:var(--r-box)}
+.tablebox thead th{position:sticky;top:0;background:var(--gray);z-index:1}
 table{border-collapse:collapse;width:100%;font-size:14px}
-th,td{text-align:right;padding:6px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+th,td{text-align:right;padding:7px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
 th:first-child,td:first-child{text-align:left}
-th{font-weight:500;color:var(--muted);font-size:13px}
+th{font-weight:500;color:var(--muted-2);font-size:13px}
 td{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
 tr.in-ref td{background:var(--band-a)}
 tr.in-real td{background:var(--band-b)}
-.notes{display:grid;gap:10px;font-size:15px;max-width:82ch;min-width:0;overflow-wrap:anywhere}
-.notes ul{margin:0;padding-left:20px;display:grid;gap:8px}
 .ctable{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(260px,100%),1fr));gap:12px}
 .ctable table td,.ctable table th{text-align:left;white-space:normal}
+.refs{font:700 12px/1.5 var(--f-display);letter-spacing:.06em;text-transform:uppercase;color:var(--muted-2)}
+.legal{display:grid;gap:8px;font-size:14px;color:var(--muted);max-width:92ch}
+.legal b{color:var(--ink);font-weight:500}
 
-/* Aviso legal y fuente de los datos */
-.legal{display:grid;gap:12px;background:var(--sunk);border-radius:12px;padding:20px 24px}
-.legal-short{font-size:15px;max-width:86ch}
-.legal details{border-top:1px solid var(--line-strong);padding-top:10px}
-.legal summary{cursor:pointer;font:600 16px/1.4 var(--f-display);width:max-content;max-width:100%}
-.legal .refs{font:700 12px/1.5 var(--f-display);letter-spacing:.06em;text-transform:uppercase;color:var(--muted-sunk);margin:10px 0 8px}
-.legal .notes{font-size:14px;color:var(--ink)}
-.source{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:14px;color:var(--muted)}
-
-/* Pie de la página independiente (como el de la web, en gris) */
-.foot{background:var(--sunk);color:var(--muted-sunk);font-size:14px}
-.foot-in{max-width:calc(var(--wrap) + 32px);margin:0 auto;padding:24px var(--gut-r) calc(24px + env(safe-area-inset-bottom,0px)) var(--gut);display:flex;flex-wrap:wrap;gap:10px 24px;align-items:center;justify-content:space-between}
-.foot b{font-family:var(--f-display);font-weight:700;color:var(--ink)}
-.foot-tools{display:flex;flex-wrap:wrap;gap:8px}
-.btn-sec{display:inline-flex;align-items:center;gap:6px;border-radius:var(--r-pill);padding:7px 18px;background:var(--surface);color:var(--ink);border:1px solid var(--line-strong);font:500 14px/1.2 var(--f-body);cursor:pointer}
-.btn-sec:hover{border-color:var(--muted)}
-.btn-sec svg{width:16px;height:16px}
-.foot .msg{flex-basis:100%}
+/* Pie, como el de la web */
+.foot{background:var(--gray)}
+.foot-in{padding-block:48px 28px;display:grid;gap:32px}
+.foot-cols{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:28px 64px}
+@media (max-width:767.98px){.foot-cols{grid-template-columns:1fr}.foot-in{padding-block:36px 24px}}
+.foot h2{font:700 18px/1.3 var(--f-body);margin-bottom:12px}
+.foot p{line-height:1.7}
+.foot .about{max-width:56ch}
+.units{margin-top:10px;font:500 16px var(--f-display)}
+.u-st{color:var(--stinsa-ink)} .u-ta{color:var(--transargi-ink)} .u-in{color:var(--intraser)}
+.btn-mini{font:400 13px/1 var(--f-body);border:1px solid var(--field-line);background:var(--white);color:var(--ink);border-radius:var(--r-pill);padding:4px 10px;cursor:pointer;margin-left:8px;vertical-align:1px}
+.btn-mini:hover{border-color:var(--ink)}
+.copy{font-size:15px;color:var(--muted-2)}
 
 .beta{background:#a8461a;color:#fff;text-align:center;font:700 13px/1.4 var(--f-body);padding:6px 16px}
-.beta a{color:#fff}
-[data-embed] .beta{display:none}
-/* Modo incrustado: la cabecera y el pie los pone Odoo; sin márgenes laterales extra y fondo transparente */
-[data-embed] body{background:transparent}
-[data-embed] html{scroll-padding-top:0}
-[data-embed] .site-head,[data-embed] .foot,[data-embed] .skip{display:none}
-[data-embed] .wrap{max-width:none;padding:2px 3px 12px}
-[data-embed] .hero{padding-top:20px}
-[data-embed]:not([data-lang-fixed]) .hero-lang{display:inline-flex}
-[data-notitle] #hEyebrow,[data-notitle] #hTitle,[data-notitle] #hLede,[data-notitle] .hero::before{display:none}
-[data-notitle] .hero{padding-top:4px}
-[data-notitle] .hero-text{max-width:100%}
-
-@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
-<!-- Loader de marca: pantalla de inicio hasta tener los precios (ver trimodos-loader.js). En modo incrustado no hay pantalla de inicio. -->
-<script src="../trimodos-loader.js" data-wait="ready"></script>
-<div class="beta">VERSIÓN DE PRUEBAS · los cálculos pueden cambiar · <a href="../">Ir a la versión estable</a></div>
-
+<div class="beta">VERSIÓN DE PRUEBAS · los cálculos pueden cambiar</div>
 <a class="skip" href="#main" id="skipLink">Saltar al contenido</a>
 <header class="site-head">
-  <div class="site-head-in">
-    <a class="logo" href="https://www.grupotrimodos.com/" aria-label="Grupo Trimodos" data-site>
-      <img src="../img/trimodos.png" alt="Grupo Trimodos" width="132" height="30" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'alt',textContent:'GRUPO TRIMODOS'}))">
-    </a>
-    <div class="head-tools">
-      <div class="lang" role="group" aria-label="Idioma / Language">
-        <button type="button" data-lang="es" aria-pressed="true" title="Español (España)">ES</button><button type="button" data-lang="en" aria-pressed="false" title="English (UK)">EN</button>
-      </div>
-      <a class="btn-outline" id="lnkBack" href="https://www.grupotrimodos.com/" data-site aria-label="Volver a grupotrimodos.com"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg><span class="back-txt" id="lnkBackTxt">Volver a grupotrimodos.com</span></a>
+  <div class="container head-in">
+    <span class="logo"><img src="../img/logo-trimodos.png" alt="Grupo Trimodos" width="150" height="40"></span>
+    <div class="lang" role="group" aria-label="Idioma / Language">
+      <button type="button" data-lang="es" aria-pressed="true" title="Español (España)">ES</button><button type="button" data-lang="en" aria-pressed="false" title="English (UK)">EN</button>
     </div>
   </div>
 </header>
 
-<main class="wrap" id="main" tabindex="-1">
+<main id="main" tabindex="-1">
   <section class="hero" aria-labelledby="hTitle">
-    <div class="hero-text">
-      <p class="eyebrow" id="hEyebrow">Herramientas</p>
+    <div class="container hero-in">
       <h1 id="hTitle">Calculadora de revisión del precio del transporte por gasóleo</h1>
-      <p class="lede" id="hLede">Calcula cuánto debe cambiar el precio de un transporte por carretera cuando sube o baja el gasóleo. Por ley (art. 38 de la Ley 15/2009), el precio se revisa cuando el gasóleo varía un 5 % o más entre la fecha del contrato y la del transporte.</p>
-      <p class="updated"><span id="lblUpdated">Datos actualizados a:</span> <b id="stLast">—</b></p>
+      <p class="lead" id="hLede">Calcula cuánto debe cambiar el precio de un transporte por carretera cuando sube o baja el gasóleo. Por ley (art. 38 de la Ley 15/2009), el precio se revisa cuando el gasóleo varía un 5 % o más entre la fecha del contrato y la del transporte.</p>
+      <p class="updated"><span id="lblUpdated">Precios oficiales actualizados a:</span> <b id="stLast">…</b></p>
       <p class="notice" id="stMsg" role="status" hidden></p>
     </div>
-    <div class="lang hero-lang" role="group" aria-label="Idioma / Language">
-      <button type="button" data-lang="es" aria-pressed="true" title="Español (España)">ES</button><button type="button" data-lang="en" aria-pressed="false" title="English (UK)">EN</button>
+  </section>
+
+  <section class="band-cream" aria-labelledby="hData">
+    <h2 class="sr-only" id="hData">Datos del cálculo</h2>
+    <div class="container calc">
+      <div class="pair">
+        <section class="box panel ref" id="pRef" aria-labelledby="hRef">
+          <header>
+            <p class="kicker" id="tagRef">Referencia</p>
+            <h2 class="h4" id="hRef">Fecha del contrato</h2>
+            <p class="help" id="helpRef">Precio del gasóleo cuando se pactó el precio del transporte.</p>
+          </header>
+          <div class="mode">
+            <span class="lbl" id="modeRef">Precio según</span>
+            <div class="seg" role="group" aria-labelledby="modeRef hRef"><button type="button" data-mode="manual">Manual</button><button type="button" data-mode="date">Día</button><button type="button" data-mode="week">Semana</button><button type="button" data-mode="month">Mes</button><button type="button" data-mode="nat">Mes natural</button></div>
+          </div>
+          <div class="fields">
+            <div class="field" data-for="manual"><label for="refMan">Precio (€/litro)</label><input type="number" id="refMan" min="0" step="0.00001" inputmode="decimal" placeholder="1,50000"></div>
+            <div class="field" data-for="date"><label for="refDate">Día</label><input type="date" id="refDate"></div>
+            <div class="field" data-for="week"><label for="refWeek">Cualquier día de la semana</label><input type="date" id="refWeek"></div>
+            <div class="field" data-for="month"><label for="refMonth">Mes</label><input type="month" id="refMonth"></div>
+            <div class="field" data-for="nat"><label for="refNat">Mes natural</label><input type="month" id="refNat"></div>
+          </div>
+          <div class="readout"><span class="big" id="refVal">—</span><span class="unit">€/litro</span><p class="weeks" id="refWeeks"></p></div>
+        </section>
+
+        <section class="box panel real" id="pReal" aria-labelledby="hReal">
+          <header>
+            <p class="kicker" id="tagReal">Realización</p>
+            <h2 class="h4" id="hReal">Fecha del transporte</h2>
+            <p class="help" id="helpReal">Precio del gasóleo cuando se hizo el transporte.</p>
+          </header>
+          <div class="mode">
+            <span class="lbl" id="modeReal">Precio según</span>
+            <div class="seg" role="group" aria-labelledby="modeReal hReal"><button type="button" data-mode="manual">Manual</button><button type="button" data-mode="date">Día</button><button type="button" data-mode="week">Semana</button><button type="button" data-mode="month">Mes</button><button type="button" data-mode="nat">Mes natural</button></div>
+          </div>
+          <div class="fields">
+            <div class="field" data-for="manual"><label for="realMan">Precio (€/litro)</label><input type="number" id="realMan" min="0" step="0.00001" inputmode="decimal" placeholder="1,50000"></div>
+            <div class="field" data-for="manual"><label for="realMdate">Fecha del transporte</label><input type="date" id="realMdate"></div>
+            <div class="field" data-for="date"><label for="realDate">Día</label><input type="date" id="realDate"></div>
+            <div class="field" data-for="week"><label for="realWeek">Cualquier día de la semana</label><input type="date" id="realWeek"></div>
+            <div class="field" data-for="month"><label for="realMonth">Mes</label><input type="month" id="realMonth"></div>
+            <div class="field" data-for="nat"><label for="realNat">Mes natural</label><input type="month" id="realNat"></div>
+          </div>
+          <div class="readout"><span class="big" id="realVal">—</span><span class="unit">€/litro</span><p class="weeks" id="realWeeks"></p></div>
+        </section>
+      </div>
+
+      <section class="box settings" aria-labelledby="hSet">
+        <h2 class="h4" id="hSet">Vehículo y contrato</h2>
+        <div class="fields">
+          <div class="field" style="flex:2 1 300px"><label for="veh">Tipo de vehículo</label>
+            <select id="veh">
+              <option value="A">A · MMA ≥ 20.000 kg (salvo obras)</option>
+              <option value="B">B · MMA entre 3.500 y 20.000 kg (salvo obras)</option>
+              <option value="C">C · Obras con MMA &gt; 3.500 kg</option>
+              <option value="D">D · MMA ≤ 3.500 kg</option>
+            </select></div>
+          <div class="field"><label for="price">Precio pactado del transporte (€)</label><input type="number" id="price" min="0" step="0.01" inputmode="decimal"></div>
+        </div>
+        <div class="checks">
+          <label class="check" id="gpRow"><input type="checkbox" id="gp"><span id="gpTxt">Vehículo de MMA ≥ 7,5 t (con devolución del gasóleo profesional)</span></label>
+          <label class="check"><input type="checkbox" id="cont"><span id="contTxt">Contrato de transporte continuado (se revisa en cada facturación)</span></label>
+        </div>
+      </section>
     </div>
   </section>
 
-  <div class="pair">
-    <section class="panel ref" id="pRef" aria-labelledby="hRef">
-      <header>
-        <span class="tag ref" id="tagRef">Referencia</span>
-        <h2 id="hRef">Fecha del contrato</h2>
-        <p class="help" id="helpRef">Precio del gasóleo cuando se pactó el precio del transporte.</p>
-      </header>
-      <div class="mode">
-        <span class="lbl" id="modeRef">Precio según</span>
-        <div class="seg" role="group" aria-labelledby="modeRef hRef"><button type="button" data-mode="manual">Manual</button><button type="button" data-mode="date">Día</button><button type="button" data-mode="week">Semana</button><button type="button" data-mode="month">Mes</button><button type="button" data-mode="nat">Mes natural</button></div>
+  <section class="band-sun" aria-labelledby="hRes">
+    <div class="container res">
+      <h2 class="res-kicker" id="hRes">Resultado</h2>
+      <div class="res-top">
+        <div><p class="k" id="kPct">Variación del precio del transporte</p><p class="v xl" id="rPct">—</p></div>
+        <div class="res-amounts">
+          <div><p class="k" id="kDP">Importe a revisar</p><p class="v" id="rDP">—</p></div>
+          <div><p class="k" id="kNP">Nuevo precio</p><p class="v" id="rNP">—</p><p class="s" id="sNP"></p></div>
+        </div>
       </div>
-      <div class="fields">
-        <div class="field" data-for="manual"><label for="refMan">Precio (€/litro)</label><input type="number" id="refMan" min="0" step="0.00001" inputmode="decimal" placeholder="1,50000"></div>
-        <div class="field" data-for="date"><label for="refDate">Día</label><input type="date" id="refDate"></div>
-        <div class="field" data-for="week"><label for="refWeek">Cualquier día de la semana</label><input type="date" id="refWeek"></div>
-        <div class="field" data-for="month"><label for="refMonth">Mes</label><input type="month" id="refMonth"></div>
-        <div class="field" data-for="nat"><label for="refNat">Mes natural</label><input type="month" id="refNat"></div>
+      <div class="verdict info" id="rVerdict"><span class="v-ico" aria-hidden="true" id="rVerdictI">–</span><span class="v-txt"><span class="v-t" id="rVerdictT">—</span><span class="v-d" id="rVerdictD"></span></span></div>
+      <p class="res-sec"><span id="kG">Variación del gasóleo (G)</span> <b id="rG">—</b><span class="sep" aria-hidden="true">·</span><span id="kC">Coeficiente C</span> <b id="rC">—</b> <span class="note" id="rCs"></span></p>
+      <div class="res-actions">
+        <button type="button" id="btnShare" class="btn-pill"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7 8l5-5 5 5"/><path d="M5 13v6a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-6"/></svg><span id="btnShareTxt">Compartir resultado</span></button>
+        <p class="share-msg" id="shareMsg" aria-live="polite"></p>
       </div>
-      <div class="readout"><span class="big" id="refVal">—</span><span class="unit">€/litro</span><p class="weeks" id="refWeeks"></p></div>
-    </section>
-
-    <section class="panel real" id="pReal" aria-labelledby="hReal">
-      <header>
-        <span class="tag real" id="tagReal">Realización</span>
-        <h2 id="hReal">Fecha del transporte</h2>
-        <p class="help" id="helpReal">Precio del gasóleo cuando se hizo el transporte.</p>
-      </header>
-      <div class="mode">
-        <span class="lbl" id="modeReal">Precio según</span>
-        <div class="seg" role="group" aria-labelledby="modeReal hReal"><button type="button" data-mode="manual">Manual</button><button type="button" data-mode="date">Día</button><button type="button" data-mode="week">Semana</button><button type="button" data-mode="month">Mes</button><button type="button" data-mode="nat">Mes natural</button></div>
-      </div>
-      <div class="fields">
-        <div class="field" data-for="manual"><label for="realMan">Precio (€/litro)</label><input type="number" id="realMan" min="0" step="0.00001" inputmode="decimal" placeholder="1,50000"></div>
-        <div class="field" data-for="manual"><label for="realMdate">Fecha del transporte</label><input type="date" id="realMdate"></div>
-        <div class="field" data-for="date"><label for="realDate">Día</label><input type="date" id="realDate"></div>
-        <div class="field" data-for="week"><label for="realWeek">Cualquier día de la semana</label><input type="date" id="realWeek"></div>
-        <div class="field" data-for="month"><label for="realMonth">Mes</label><input type="month" id="realMonth"></div>
-        <div class="field" data-for="nat"><label for="realNat">Mes natural</label><input type="month" id="realNat"></div>
-      </div>
-      <div class="readout"><span class="big" id="realVal">—</span><span class="unit">€/litro</span><p class="weeks" id="realWeeks"></p></div>
-    </section>
-  </div>
-
-  <section class="card settings" aria-labelledby="hSet">
-    <h2 id="hSet">Vehículo y contrato</h2>
-    <div class="fields">
-      <div class="field" style="flex:2 1 280px"><label for="veh">Tipo de vehículo</label>
-        <select id="veh">
-          <option value="A">A · MMA ≥ 20.000 kg (salvo obras)</option>
-          <option value="B">B · MMA entre 3.500 y 20.000 kg (salvo obras)</option>
-          <option value="C">C · Obras con MMA &gt; 3.500 kg</option>
-          <option value="D">D · MMA ≤ 3.500 kg</option>
-        </select></div>
-      <div class="field"><label for="price">Precio pactado del transporte (€)</label><input type="number" id="price" min="0" step="0.01" inputmode="decimal"></div>
-    </div>
-    <div class="checks">
-      <label class="check" id="gpRow"><input type="checkbox" id="gp"><span id="gpTxt">Vehículo de MMA ≥ 7,5 t (con devolución del gasóleo profesional)</span></label>
-      <label class="check"><input type="checkbox" id="cont"><span id="contTxt">Contrato de transporte continuado (se revisa en cada facturación)</span></label>
+      <p class="sr-only" id="rLive" aria-live="polite" aria-atomic="true"></p>
     </div>
   </section>
 
-  <section class="result" aria-labelledby="hRes">
-    <h2 class="res-eyebrow" id="hRes">Resultado</h2>
-    <div class="res-top">
-      <div>
-        <div class="k" id="kPct">Variación del precio del transporte</div>
-        <div class="v xl" id="rPct">—</div>
-        <div class="s" id="sPct">G × C</div>
-      </div>
-      <div class="res-amounts">
-        <div><div class="k" id="kDP">Importe a revisar (ΔP)</div><div class="v" id="rDP">—</div></div>
-        <div><div class="k" id="kNP">Nuevo precio</div><div class="v" id="rNP">—</div><div class="s" id="sNP"></div></div>
-      </div>
+  <section class="container more" aria-labelledby="hMore">
+    <h2 class="sr-only" id="hMore">Más información</h2>
+    <div class="acc">
+      <details id="advBox">
+        <summary><span id="advT">Opciones avanzadas</span><span class="badge" id="advBadge" hidden>Modificadas</span><span class="sum-hint" id="advHint">Precio para calcular G, umbral, redondeo y coeficiente C</span></summary>
+        <div class="acc-body">
+          <div class="fields">
+            <div class="field" style="flex:2 1 300px"><label for="basis">Precio para calcular G</label>
+              <select id="basis">
+                <option value="auto">Automático según fecha del transporte</option>
+                <option value="pmed">Pmed (PVP sin IVA ni devolución gasóleo profesional)</option>
+                <option value="pai">Precio antes de impuestos (PAI)</option>
+                <option value="pvpsin">PVP sin IVA</option>
+                <option value="pvp">PVP en surtidor</option>
+              </select></div>
+            <div class="field"><label for="thr">Umbral de revisión (%)</label><input type="number" id="thr" min="0" step="0.1" inputmode="decimal"></div>
+            <div class="field"><label for="rnd">Redondeo de G (decimales del %)</label>
+              <select id="rnd">
+                <option value="none">Sin redondeo</option>
+                <option value="0">0 decimales (43 %)</option>
+                <option value="1">1 decimal (42,6 %)</option>
+                <option value="2">2 decimales (42,57 %)</option>
+                <option value="3">3 decimales (42,573 %)</option>
+                <option value="4">4 decimales (42,5731 %)</option>
+              </select></div>
+          </div>
+          <div class="checks" style="align-items:center">
+            <label class="check"><input type="checkbox" id="cMan"><span id="cManTxt">Fijar C a mano</span></label>
+            <div class="field" style="flex:0 1 140px" id="cManBox" hidden><label for="cVal">Coeficiente C</label><input type="number" id="cVal" min="0" max="1" step="0.05"></div>
+          </div>
+          <p class="hint" id="basisHint"></p>
+        </div>
+      </details>
+
+      <details id="detChart">
+        <summary><span id="detChartT">Evolución del precio del gasóleo</span></summary>
+        <div class="acc-body">
+          <div class="legend"><span><i style="background:var(--dark)"></i><span id="lgSeries">Precio</span></span><span><i style="background:var(--band-a)"></i><span id="lgRef">Referencia</span></span><span><i style="background:var(--band-b)"></i><span id="lgReal">Realización</span></span></div>
+          <div class="svgbox"><svg id="svg" role="img" aria-label="Gráfica del precio semanal del gasóleo" width="100%" height="260"></svg></div>
+        </div>
+      </details>
+
+      <details id="detHow">
+        <summary><span id="detHowT">Cómo se calcula</span></summary>
+        <div class="acc-body notes">
+          <div class="calc-sum">
+            <p><b id="sumT">Tu cálculo</b></p>
+            <p class="mono" id="rFormula">—</p>
+            <p><span id="lblBasis">Precio usado para G:</span> <span id="rGs"></span></p>
+          </div>
+          <p class="mono" id="howF">ΔP = G × P × C / 100 &nbsp;·&nbsp; G = (P<sub>transporte</sub> − P<sub>referencia</sub>) / P<sub>referencia</sub> × 100</p>
+          <p id="howR">G se redondea al número de decimales elegido (redondeo aritmético: 5 o más sube) antes de multiplicarlo por C. Ese G redondeado es también el que se compara con el umbral.</p>
+          <ul id="howL">
+            <li><b>Manual:</b> el precio que escribas, en €/litro. <b>Día:</b> precio de la primera fecha publicada igual o posterior al día indicado. <b>Semana:</b> precio de la semana (de lunes a domingo) que contiene el día indicado. <b>Mes:</b> media simple de las semanas publicadas en ese mes. <b>Mes natural:</b> cada día del mes toma el precio de la primera semana publicada igual o posterior a ese día (como en «Día») y se hace la media de todos los días naturales del mes.</li>
+            <li><b>Precio para G (automático):</b> transporte desde el 16/04/2026, Pmed (PVP sin IVA y, para MMA ≥ 7,5 t, sin la devolución del gasóleo profesional); del 22/03 al 15/04/2026, PAI; antes, PVP.</li>
+            <li><b>Coeficiente C:</b> desde el 01/07/2026 (RDL 18/2026) según el Pmed del transporte; del 16/04 al 30/06/2026 (RDL 9/2026) según el PAI; antes, coeficiente fijo por vehículo. Si el transporte se indica por semana o por mes, se usa el mismo precio medio; con precio manual, ese precio.</li>
+            <li>La revisión es obligatoria cuando |G| ≥ 5 % o el umbral menor pactado por escrito, y siempre en los contratos continuados en cada periodo de facturación. No pueden computarse las bonificaciones extraordinarias del gasóleo.</li>
+          </ul>
+          <h3 id="howWeeksT">Semanas utilizadas</h3>
+          <div class="tablebox"><table id="tbl"><thead><tr><th>Semana (lunes)</th><th>PVP</th><th>PVP sin IVA</th><th>Impuesto hidrocarburos</th><th>PAI</th><th>Devol. GP</th><th>Pmed ≥ 7,5 t</th><th>Pmed &lt; 7,5 t</th></tr></thead><tbody></tbody></table></div>
+          <h3 id="howCT">Tablas del coeficiente C</h3>
+          <div class="ctable">
+            <table><thead><tr><th colspan="2" id="ct18T">RDL 18/2026 · Pmed (€/l)</th></tr></thead><tbody id="ct18"></tbody></table>
+            <table><thead><tr><th colspan="2" id="ct9T">RDL 9/2026 · PAI (€/l)</th></tr></thead><tbody id="ct9"></tbody></table>
+          </div>
+          <h3 id="howLawT">Normativa</h3>
+          <p class="refs" id="legalRefs">Ley 15/2009, art. 38 · Orden FOM/1882/2012, condición 3.4 · Real Decreto-ley 9/2026 · Real Decreto-ley 18/2026</p>
+          <p id="legalP1">El cálculo aplica la fórmula de la condición 3.4 de la Orden FOM/1882/2012, en la redacción del Real Decreto-ley 9/2026 y del Real Decreto-ley 18/2026, con las reglas del artículo 38 de la Ley 15/2009, del contrato de transporte terrestre de mercancías. Desde la entrada en vigor del RD-ley 18/2026, el 1 de julio de 2026, cambian el precio de referencia que se usa y los umbrales que fijan el coeficiente C (nota metodológica del Ministerio de 3/7/2026).</p>
+        </div>
+      </details>
     </div>
-    <div class="verdict info" id="rVerdict"><span class="v-ico" aria-hidden="true" id="rVerdictI">–</span><span class="v-txt"><span class="v-t" id="rVerdictT">—</span><span class="v-d" id="rVerdictD"></span></span></div>
-    <dl class="res-sec">
-      <div><dt id="kG">Variación del gasóleo (G)</dt><dd><div class="v2" id="rG">—</div><div class="s" id="rGs"></div></dd></div>
-      <div><dt id="kC">Coeficiente C</dt><dd><div class="v2" id="rC">—</div><div class="s" id="rCs"></div></dd></div>
-    </dl>
-    <p class="formula" id="rFormula"></p>
-    <div class="res-actions">
-      <button type="button" id="btnShare" class="btn-pill light"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg><span id="btnShareTxt">Compartir resultado</span></button>
-      <p class="share-msg" id="shareMsg" aria-live="polite"></p>
+
+    <div class="legal">
+      <p id="legalShort"><b>Resultado orientativo.</b> Depende de los datos introducidos y Grupo Trimodos no se hace responsable de las decisiones que se tomen a partir de él. Para una reclamación o un litigio, contrástalo con la calculadora oficial del Ministerio de Transportes y Movilidad Sostenible.</p>
+      <p id="srcTxt">Precios: evolución semanal del gasóleo de automoción en España publicada por el Ministerio de Transportes y Movilidad Sostenible.</p>
     </div>
-    <p class="sr-only" id="rLive" aria-live="polite" aria-atomic="true"></p>
   </section>
-
-  <aside class="cta" aria-labelledby="ctaT">
-    <div>
-      <p class="cta-t" id="ctaT">¿Dudas sobre la revisión de tus tarifas?</p>
-      <p class="cta-s" id="ctaS">Te ayudamos a aplicarla en tus contratos de transporte.</p>
-    </div>
-    <a class="btn-primary" id="ctaBtn" href="https://www.grupotrimodos.com/contacta" target="_blank" rel="noopener" data-site>Hablamos</a>
-  </aside>
-
-  <details class="card" id="advBox">
-    <summary><span id="advT">Opciones avanzadas</span><span class="badge" id="advBadge" hidden>Modificadas</span><span class="sum-hint" id="advHint">Precio para calcular G, umbral, redondeo y coeficiente C</span></summary>
-    <div class="det-body">
-      <div class="fields">
-        <div class="field" style="flex:2 1 280px"><label for="basis">Precio para calcular G</label>
-          <select id="basis">
-            <option value="auto">Automático según fecha del transporte</option>
-            <option value="pmed">Pmed (PVP sin IVA ni devolución gasóleo profesional)</option>
-            <option value="pai">Precio antes de impuestos (PAI)</option>
-            <option value="pvpsin">PVP sin IVA</option>
-            <option value="pvp">PVP en surtidor</option>
-          </select></div>
-        <div class="field"><label for="thr">Umbral de revisión (%)</label><input type="number" id="thr" min="0" step="0.1" inputmode="decimal"></div>
-        <div class="field"><label for="rnd">Redondeo de G (decimales del %)</label>
-          <select id="rnd">
-            <option value="none">Sin redondeo</option>
-            <option value="0">0 decimales (43 %)</option>
-            <option value="1">1 decimal (42,6 %)</option>
-            <option value="2">2 decimales (42,57 %)</option>
-            <option value="3">3 decimales (42,573 %)</option>
-            <option value="4">4 decimales (42,5731 %)</option>
-          </select></div>
-      </div>
-      <div class="checks" style="align-items:center">
-        <label class="check"><input type="checkbox" id="cMan"><span id="cManTxt">Fijar C a mano</span></label>
-        <div class="field" style="flex:0 1 140px" id="cManBox" hidden><label for="cVal">Coeficiente C</label><input type="number" id="cVal" min="0" max="1" step="0.05"></div>
-      </div>
-      <p class="hint" id="basisHint"></p>
-    </div>
-  </details>
-
-  <section class="card chart" aria-labelledby="hChart">
-    <h2 id="hChart">Evolución del precio usado para G</h2>
-    <div class="legend"><span><i style="background:var(--chart)"></i><span id="lgSeries">Precio</span></span><span><i style="background:var(--band-a)"></i><span id="lgRef">Referencia</span></span><span><i style="background:var(--band-b)"></i><span id="lgReal">Realización</span></span></div>
-    <div class="svgbox"><svg id="svg" role="img" aria-label="Gráfica del precio semanal del gasóleo" width="100%" height="260"></svg></div>
-  </section>
-
-  <details class="card" id="detWeeks">
-    <summary id="detWeeksT">Semanas utilizadas</summary>
-    <div class="det-body">
-      <div class="tablebox"><table id="tbl"><thead><tr><th>Semana (lunes)</th><th>PVP</th><th>PVP sin IVA</th><th>Impuesto hidrocarburos</th><th>PAI</th><th>Devol. GP</th><th>Pmed ≥ 7,5 t</th><th>Pmed &lt; 7,5 t</th></tr></thead><tbody></tbody></table></div>
-    </div>
-  </details>
-
-  <details class="card" id="detHow">
-    <summary id="detHowT">Cómo se calcula</summary>
-    <div class="det-body notes">
-      <p class="mono" id="howF">ΔP = G × P × C / 100 &nbsp;·&nbsp; G = (P<sub>cálculo</sub> − P<sub>referencia</sub>) / P<sub>referencia</sub> × 100</p>
-      <p id="howR">G se redondea al número de decimales elegido (redondeo aritmético: 5 o más sube) antes de multiplicarlo por C. Ese G redondeado es también el que se compara con el umbral.</p>
-      <ul id="howL">
-        <li><b>Manual:</b> el precio que escribas, en €/litro. <b>Día:</b> precio de la primera fecha de la Excel igual o posterior al día indicado. <b>Semana:</b> precio de la semana (de lunes a domingo) que contiene el día indicado. <b>Mes:</b> media simple de las semanas cuya fecha en la Excel pertenece a ese mes. <b>Mes natural:</b> cada día del mes toma el precio de la primera semana publicada igual o posterior a ese día (como en «Día») y se hace la media de todos los días naturales del mes.</li>
-        <li><b>Precio para G (automático):</b> transporte desde el 16/04/2026, Pmed (PVP sin IVA y, para MMA ≥ 7,5 t, sin la devolución del gasóleo profesional); del 22/03 al 15/04/2026, PAI; antes, PVP.</li>
-        <li><b>Coeficiente C:</b> desde el 01/07/2026 (RDL 18/2026) según el Pmed del transporte; del 16/04 al 30/06/2026 (RDL 9/2026) según el PAI; antes, coeficiente fijo por vehículo. Si el transporte se indica por semana o por mes, se usa el mismo precio medio; con precio manual, ese precio.</li>
-        <li>La revisión es obligatoria cuando |G| ≥ 5 % o el umbral menor pactado por escrito, y siempre en los contratos continuados en cada periodo de facturación. No pueden computarse las bonificaciones extraordinarias del gasóleo.</li>
-      </ul>
-      <div class="ctable">
-        <table><thead><tr><th colspan="2" id="ct18T">RDL 18/2026 · Pmed (€/l)</th></tr></thead><tbody id="ct18"></tbody></table>
-        <table><thead><tr><th colspan="2" id="ct9T">RDL 9/2026 · PAI (€/l)</th></tr></thead><tbody id="ct9"></tbody></table>
-      </div>
-    </div>
-  </details>
-
-  <section class="legal" aria-labelledby="hLegal">
-    <h2 class="sr-only" id="hLegal">Aviso legal</h2>
-    <p class="legal-short" id="legalShort"><b>Resultado orientativo.</b> Depende de los datos que introduzcas y Grupo Trimodos no se hace responsable de las decisiones que se tomen a partir de él. Para una reclamación o un litigio, contrástalo con la <a href="https://apps.fomento.gob.es/preciogasoleo/angular_proyecto/client/gasoleoCambio" target="_blank" rel="noopener">calculadora oficial del Ministerio</a>.</p>
-    <details id="detLegal">
-      <summary id="detLegalT">Normativa aplicable</summary>
-      <p class="refs" id="legalRefs">Ley 15/2009, art. 38 · Orden FOM/1882/2012, condición 3.4 · Real Decreto-ley 9/2026 · Real Decreto-ley 18/2026</p>
-      <div class="notes">
-        <p id="legalP1">El cálculo aplica la fórmula de la condición 3.4 de la Orden FOM/1882/2012, en la redacción del Real Decreto-ley 9/2026 y del Real Decreto-ley 18/2026, con las reglas del artículo 38 de la Ley 15/2009, del contrato de transporte terrestre de mercancías. Los precios son los de la evolución semanal del gasóleo de automoción en España que publica el Ministerio de Transportes y Movilidad Sostenible.</p>
-        <p id="legalP2">Desde la entrada en vigor del RD-ley 18/2026, el 1 de julio de 2026, cambian el precio de referencia que se usa y los umbrales que fijan el coeficiente C. <a href="https://www.transportes.gob.es/recursos_mfom/comodin/recursos/20260702_nota_metodologica_variacion_precio_transporte.pdf" target="_blank" rel="noopener">Nota metodológica del Ministerio (3/7/2026)</a>.</p>
-      </div>
-    </details>
-  </section>
-
-  <p class="source"><span id="srcTxt">Precios: Ministerio de Transportes y Movilidad Sostenible</span> <a id="lnkMin" href="https://www.transportes.gob.es/transporte-terrestre/servicios-al-transportista/indice-de-variacion-semanal-de-los-precios-medios-del-gasoleo-en-espana" target="_blank" rel="noopener">Página oficial de precios del gasóleo ↗</a></p>
 </main>
 
 <footer class="foot">
-  <div class="foot-in">
-    <span id="footTxt">Una herramienta de <b>Grupo Trimodos</b> · Stinsa · Transargi</span>
-    <span class="foot-tools">
-      <button type="button" class="btn-sec" id="btnShareApp"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/></svg><span id="btnShareAppTxt">Compartir enlace</span></button>
-      <button type="button" class="btn-sec" id="btnInstall" hidden>Instalar app</button>
-    </span>
-    <p class="msg" id="installMsg" hidden></p>
+  <div class="container foot-in">
+    <div class="foot-cols">
+      <div>
+        <h2 id="fAboutT">Grupo Trimodos</h2>
+        <p class="about" id="fAbout">Somos una compañía de transportes y logística especializada en el transporte intermodal. Tras más de 40 años de experiencia, seguimos trabajando con un mismo objetivo: ayudar a las empresas a optimizar sus redes logísticas de forma eficaz, cercana y honesta.</p>
+        <p class="units"><span class="u-st">Stinsa</span> · <span class="u-ta">Transargi</span> · <span class="u-in">Intraser</span></p>
+      </div>
+      <div>
+        <h2 id="fTalkT">¿Hablamos?</h2>
+        <p><span id="fMail">comercial@grupotrimodos.com</span><button type="button" class="btn-mini" id="btnCopyMail">Copiar</button></p>
+        <p>Stinsa: +34 964 526 061</p>
+        <p>Stinsa Andalucía: +34 954 250 979</p>
+        <p>Transargi: +34 964 200 311</p>
+      </div>
+    </div>
+    <p class="copy">Copyright © TRIMODOS, S.L</p>
   </div>
 </footer>
 
@@ -506,46 +427,19 @@ tr.in-real td{background:var(--band-b)}
 (async function(){
 "use strict";
 
-const EMBED=document.documentElement.hasAttribute("data-embed");
-// Dirección pública de la calculadora en la web de Odoo (pie de la imagen, texto al compartir y enlace de la app)
-const PUBLIC_URL={es:"https://www.grupotrimodos.com/calculadora-gasoleo",en:"https://www.grupotrimodos.com/en/calculadora-gasoleo"};
-const CONTACT_URL={es:"https://www.grupotrimodos.com/contacta",en:"https://www.grupotrimodos.com/en/contacta"};
-
-// ---- Modo incrustado: altura automática del iframe ----
-// Solo se envía la altura a las páginas permitidas (la web de Grupo Trimodos y, para pruebas, localhost).
-// La página padre puede saludar con {source:"trimodos-gasoleo",type:"hello"} para recibir la altura al momento.
-const PARENT_OK=o=>/^https:\/\/(www\.)?grupotrimodos\.com$/.test(o)||/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(o);
-if(EMBED&&window.parent!==window){
-  let destino=null,ultima=0;
-  const candidato=(()=>{try{const a=location.ancestorOrigins;if(a&&a.length)return a[0]}catch(e){}try{return document.referrer?new URL(document.referrer).origin:""}catch(e){return ""}})();
-  if(PARENT_OK(candidato))destino=candidato;
-  const enviar=()=>{
-    if(!destino)return;
-    const h=Math.ceil(document.body.getBoundingClientRect().height);
-    if(!h||h===ultima)return;ultima=h;
-    window.parent.postMessage({source:"trimodos-gasoleo",type:"height",height:h},destino);
-  };
-  window.addEventListener("message",e=>{
-    if(e.source!==window.parent||!PARENT_OK(e.origin))return;
-    const d=e.data;if(d&&d.source==="trimodos-gasoleo"&&d.type==="hello"){destino=e.origin;ultima=0;enviar()}
-  });
-  if("ResizeObserver" in window)new ResizeObserver(enviar).observe(document.body);
-  window.addEventListener("load",enviar);document.addEventListener("toggle",enviar,true);
-}
-
 // ---- Idiomas: español (España) e inglés (Reino Unido) ----
 const TX={
  es:{loc:"es-ES",pct:" %",
-  loadFail:m=>"No se pudieron cargar los precios ("+m+"). Recarga la página en unos segundos.",loading:"Cargando precios…",
+  loadFail:m=>"No se pudieron cargar los precios ("+m+"). Recarga la página en unos segundos.",
   wNoMonth:"El Ministerio no tiene precios publicados para ese mes.",wNoDate:"El Ministerio aún no ha publicado ningún precio en esa fecha o después.",
   wDate:d=>"Precio del "+d+" (primera fecha publicada igual o posterior)",
   wMonth:(n,mes,l)=>"Media de "+n+(n===1?" semana":" semanas")+" de "+mes+": "+l,monthOf:(m,y)=>m+" de "+y,
-  wIncomplete:" · El mes aún no está completo en la Excel.",
+  wIncomplete:" · El mes aún no está completo.",
   wManual:"Precio introducido a mano.",wManualNo:"Escribe el precio en €/litro.",wNoWeek:"El Ministerio no tiene precio publicado para esa semana.",
   wWeek:(a,b,p)=>"Semana del "+a+" al "+b+" (precio publicado el "+p+")",
   wNat:(mes,n,l)=>"Media diaria de "+mes+" ("+n+(n===1?" día":" días")+"): "+l,dd:n=>n+" d",wNatPartial:n=>" · Faltan "+n+(n===1?" día":" días")+" sin precio publicado.",
   manualLbl:"Precio manual",manualDet:"Introducido a mano",weekLbl:(a,b)=>"Semana "+a+"–"+b,natLbl:m=>m+" (mes natural)",natDet:n=>"Media diaria de "+n+(n===1?" día":" días"),cManPrice:"precio manual",
-  cMan:"Fijado a mano",cFixed:"Coeficiente fijo anterior · verifícalo",
+  cMan:"fijado a mano",cFixed:"coeficiente fijo anterior, verifícalo",
   eur:v=>v+" €",agreed:v=>"Precio pactado: "+v,
   fNoRound:g=>"Sin redondear (G = "+g+") · ",fRound:g=>"G sin redondear "+g+" · ",
   vMissing:["Faltan datos","Completa las fechas y el precio del gasóleo para ver el resultado."],
@@ -559,34 +453,30 @@ const TX={
   months:["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"],
   mShort:["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"],
   ct:{A:"A · ≥ 20 t",B:"B · 3,5–20 t",C:"C · Obras",D:"D · ≤ 3,5 t"},
-  late:(d,u)=>"Los últimos precios publicados son del "+d+"; consulta la <a href=\""+u+"\" target=\"_blank\" rel=\"noopener\">página oficial</a>.",
+  late:d=>"Los últimos precios publicados por el Ministerio son del "+d+". Si necesitas una semana posterior, consulta la publicación oficial.",
   noPrice:"Sin precio publicado",pubOn:d=>"Precio publicado el "+d,avgN:n=>"Media de "+n+(n===1?" semana":" semanas"),
   imT1:"Revisión del precio del",imT2:"transporte por gasóleo",imVeh:"Vehículo",imUsed:b=>"Precio del gasóleo usado: "+b+" · €/litro",
-  imRef:"REFERENCIA · CONTRATO",imReal:"REALIZACIÓN · TRANSPORTE",unit:"€/litro",imBig:"VARIACIÓN DEL PRECIO DEL TRANSPORTE",
-  imDP:"IMPORTE A REVISAR (ΔP)",imNP:"NUEVO PRECIO",imGC:(g,c,n)=>"Gasóleo (G) "+g+" · Coeficiente C "+c+(n?" · "+n:""),
+  imRef:"REFERENCIA",imReal:"REALIZACIÓN",unit:"€/litro",imBig:"VARIACIÓN DEL PRECIO DEL TRANSPORTE",
+  imDP:"IMPORTE A REVISAR",imNP:"NUEVO PRECIO",imGC:(g,c,n)=>"Gasóleo (G) "+g+" · Coeficiente C "+c+(n?" ("+n+")":""),
   imFoot:d=>"Precios: Ministerio de Transportes y Movilidad Sostenible (datos a "+d+") · Ley 15/2009, art. 38 · Cálculo orientativo",
-  pubHost:"grupotrimodos.com/calculadora-gasoleo",
+  pubHost:"grupotrimodos.com",
   txt:o=>`Revisión del precio del transporte por gasóleo\nReferencia (${o.ref}): ${o.rv} €/l\nRealización (${o.real}): ${o.tv} €/l\nVariación del gasóleo (G): ${o.G}\nCoeficiente C: ${o.C}\nVariación del transporte: ${o.pct}\nImporte a revisar: ${o.dP} · Nuevo precio: ${o.np}\n${o.url}`,
   needDates:"Completa las fechas para tener un resultado que compartir.",preparing:"Preparando…",shareBtn:"Compartir resultado",shareTitle:"Revisión del precio por gasóleo",
   dlCopied:"Imagen descargada y resumen copiado. Adjunta la imagen en WhatsApp o en el correo.",dl:"Imagen descargada. Adjúntala en WhatsApp o en el correo.",
   copied:"Imagen copiada. Pégala con Ctrl+V (⌘+V en Mac) en WhatsApp Web o en el correo.",download:"Descargar la imagen",shareFail:m=>"No se pudo preparar la imagen ("+m+").",file:"revision-gasoleo.png",
   title:"PRUEBAS · Calculadora de revisión por gasóleo",
-  appText:"Calculadora de la revisión del precio del transporte por la variación del gasóleo, con los precios semanales del Ministerio de Transportes.",
-  linkCopied:"Enlace copiado. Pégalo donde quieras compartirlo.",
-  installed:"App instalada. La encontrarás junto a tus otras aplicaciones.",
-  iosHelp:"Para instalarla en el iPhone o iPad: pulsa el botón Compartir de Safari (el cuadrado con la flecha) y elige «Añadir a pantalla de inicio».",
-  offline:"Sin conexión: se muestran los últimos precios descargados."},
+  copyBtn:"Copiar",copyDone:"Copiado"},
  en:{loc:"en-GB",pct:"%",
-  loadFail:m=>"The prices could not be loaded ("+m+"). Reload the page in a few seconds.",loading:"Loading prices…",
+  loadFail:m=>"The prices could not be loaded ("+m+"). Reload the page in a few seconds.",
   wNoMonth:"The Ministry has not published any prices for that month.",wNoDate:"The Ministry has not yet published a price on or after that date.",
   wDate:d=>"Price of "+d+" (first published date on or after it)",
   wMonth:(n,mes,l)=>"Average of "+n+(n===1?" week":" weeks")+" in "+mes+": "+l,monthOf:(m,y)=>m+" "+y,
-  wIncomplete:" · The month is not yet complete in the spreadsheet.",
+  wIncomplete:" · The month is not yet complete.",
   wManual:"Price entered manually.",wManualNo:"Enter the price in €/litre.",wNoWeek:"The Ministry has not published a price for that week.",
   wWeek:(a,b,p)=>"Week from "+a+" to "+b+" (price published on "+p+")",
   wNat:(mes,n,l)=>"Daily average for "+mes+" ("+n+(n===1?" day":" days")+"): "+l,dd:n=>n+" d",wNatPartial:n=>" · "+n+(n===1?" day has":" days have")+" no published price yet.",
   manualLbl:"Manual price",manualDet:"Entered manually",weekLbl:(a,b)=>"Week "+a+"–"+b,natLbl:m=>m+" (calendar month)",natDet:n=>"Daily average of "+n+(n===1?" day":" days"),cManPrice:"manual price",
-  cMan:"Set manually",cFixed:"Previous fixed coefficient · please check",
+  cMan:"set manually",cFixed:"previous fixed coefficient, please check",
   eur:v=>"€"+v,agreed:v=>"Agreed price: "+v,
   fNoRound:g=>"Not rounded (G = "+g+") · ",fRound:g=>"G before rounding "+g+" · ",
   vMissing:["Data missing","Fill in the dates and the diesel price to see the result."],
@@ -600,31 +490,27 @@ const TX={
   months:["January","February","March","April","May","June","July","August","September","October","November","December"],
   mShort:["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"],
   ct:{A:"A · ≥ 20 t",B:"B · 3.5–20 t",C:"C · Construction",D:"D · ≤ 3.5 t"},
-  late:(d,u)=>"The latest published prices are from "+d+"; please check the <a href=\""+u+"\" target=\"_blank\" rel=\"noopener\">official page</a>.",
+  late:d=>"The latest prices published by the Ministry are from "+d+". If you need a later week, check the official publication.",
   noPrice:"No published price",pubOn:d=>"Price published on "+d,avgN:n=>"Average of "+n+(n===1?" week":" weeks"),
   imT1:"Haulage price revision",imT2:"for diesel price changes",imVeh:"Vehicle",imUsed:b=>"Diesel price used: "+b+" · €/litre",
-  imRef:"REFERENCE · CONTRACT",imReal:"CARRIAGE · HAULAGE JOB",unit:"€/litre",imBig:"CHANGE IN HAULAGE PRICE",
-  imDP:"AMOUNT TO REVISE (ΔP)",imNP:"NEW PRICE",imGC:(g,c,n)=>"Diesel (G) "+g+" · Coefficient C "+c+(n?" · "+n:""),
+  imRef:"REFERENCE",imReal:"CARRIAGE",unit:"€/litre",imBig:"CHANGE IN HAULAGE PRICE",
+  imDP:"AMOUNT TO REVISE",imNP:"NEW PRICE",imGC:(g,c,n)=>"Diesel (G) "+g+" · Coefficient C "+c+(n?" ("+n+")":""),
   imFoot:d=>"Prices: Spanish Ministry of Transport and Sustainable Mobility (data to "+d+") · Law 15/2009, art. 38 · For guidance only",
-  pubHost:"grupotrimodos.com/en/calculadora-gasoleo",
+  pubHost:"grupotrimodos.com",
   txt:o=>`Haulage price revision for diesel price changes\nReference (${o.ref}): €${o.rv}/l\nCarriage (${o.real}): €${o.tv}/l\nChange in diesel price (G): ${o.G}\nCoefficient C: ${o.C}\nChange in haulage price: ${o.pct}\nAmount to revise: ${o.dP} · New price: ${o.np}\n${o.url}`,
   needDates:"Fill in the dates to get a result to share.",preparing:"Preparing…",shareBtn:"Share result",shareTitle:"Haulage price revision for diesel",
   dlCopied:"Image downloaded and summary copied. Attach the image in WhatsApp or an email.",dl:"Image downloaded. Attach it in WhatsApp or an email.",
   copied:"Image copied. Paste it with Ctrl+V (⌘+V on a Mac) into WhatsApp Web or an email.",download:"Download the image",shareFail:m=>"The image could not be prepared ("+m+").",file:"diesel-price-revision.png",
   title:"TEST · Diesel price revision calculator",
-  appText:"Calculator for revising haulage prices when the price of diesel changes, using the Spanish Ministry of Transport's weekly prices.",
-  linkCopied:"Link copied. Paste it wherever you want to share it.",
-  installed:"App installed. You will find it with your other apps.",
-  iosHelp:"To install it on an iPhone or iPad: tap Safari's Share button (the square with the arrow) and choose “Add to Home Screen”.",
-  offline:"Offline: showing the latest downloaded prices."}
+  copyBtn:"Copy",copyDone:"Copied"}
 };
 // Textos fijos de la página: [selector, contenido en inglés] (el español es el del propio HTML).
 // "@aria:" cambia el aria-label en lugar del contenido.
 const STATIC_EN=[
- ["#skipLink","Skip to content"],["#lnkBack","@aria:Back to grupotrimodos.com"],["#lnkBackTxt","Back to grupotrimodos.com"],
- ["#hEyebrow","Tools"],["#hTitle","Diesel price revision calculator for haulage"],
+ ["#skipLink","Skip to content"],
+ ["#hTitle","Diesel price revision calculator for haulage"],
  ["#hLede","Work out how much the price of a road haulage job should change when diesel goes up or down. By law (Spanish Law 15/2009, art. 38), the price is revised when diesel changes by 5% or more between the contract date and the date of carriage."],
- ["#lblUpdated","Data updated to:"],
+ ["#lblUpdated","Official prices updated to:"],["#hData","Calculation details"],
  ["#tagRef","Reference"],["#hRef","Contract date"],["#helpRef","Diesel price when the haulage price was agreed."],
  ["#tagReal","Carriage"],["#hReal","Date of carriage"],["#helpReal","Diesel price when the goods were carried."],
  ["#modeRef","Price based on"],["#modeReal","Price based on"],
@@ -635,9 +521,8 @@ const STATIC_EN=[
  ["#veh option[value=C]","C · Construction vehicles, MAM &gt; 3,500 kg"],["#veh option[value=D]","D · MAM ≤ 3,500 kg"],
  ["label[for=price]","Agreed haulage price (€)"],
  ["#gpTxt","Vehicle with MAM ≥ 7.5 t (eligible for professional diesel refund)"],["#contTxt","Continuous haulage contract (revised at each billing period)"],
- ["#hRes","Result"],["#kPct","Change in haulage price"],["#kDP","Amount to revise (ΔP)"],["#kNP","New price"],["#kG","Change in diesel price (G)"],["#kC","Coefficient C"],
- ["#btnShareTxt","Share result"],
- ["#ctaT","Questions about revising your rates?"],["#ctaS","We can help you apply it to your haulage contracts."],["#ctaBtn","Let’s talk"],
+ ["#hRes","Result"],["#kPct","Change in haulage price"],["#kDP","Amount to revise"],["#kNP","New price"],["#kG","Change in diesel price (G)"],["#kC","Coefficient C"],
+ ["#btnShareTxt","Share result"],["#hMore","More information"],
  ["#advT","Advanced options"],["#advBadge","Changed"],["#advHint","Price used for G, threshold, rounding and coefficient C"],
  ["label[for=basis]","Price used to calculate G"],
  ["#basis option[value=auto]","Automatic, based on date of carriage"],["#basis option[value=pmed]","Pmed (pump price excl. VAT and professional diesel refund)"],
@@ -646,22 +531,21 @@ const STATIC_EN=[
  ["#rnd option[value=none]","No rounding"],["#rnd option[value='0']","0 decimal places (43%)"],["#rnd option[value='1']","1 decimal place (42.6%)"],
  ["#rnd option[value='2']","2 decimal places (42.57%)"],["#rnd option[value='3']","3 decimal places (42.573%)"],["#rnd option[value='4']","4 decimal places (42.5731%)"],
  ["#cManTxt","Set C manually"],["label[for=cVal]","Coefficient C"],
- ["#hChart","Trend in the price used for G"],["#lgRef","Reference"],["#lgReal","Carriage"],["#svg","@aria:Chart of the weekly diesel price"],
- ["#detWeeksT","Weeks used"],
- ["#tbl thead","<tr><th>Week (Monday)</th><th>Pump price</th><th>Excl. VAT</th><th>Hydrocarbon tax</th><th>Pre-tax (PAI)</th><th>Prof. refund</th><th>Pmed ≥ 7.5 t</th><th>Pmed &lt; 7.5 t</th></tr>"],
- ["#detHowT","How it is calculated"],
- ["#howF","ΔP = G × P × C / 100 &nbsp;·&nbsp; G = (P<sub>calculation</sub> − P<sub>reference</sub>) / P<sub>reference</sub> × 100"],
+ ["#detChartT","Diesel price trend"],["#lgRef","Reference"],["#lgReal","Carriage"],["#svg","@aria:Chart of the weekly diesel price"],
+ ["#detHowT","How it is calculated"],["#sumT","Your calculation"],["#lblBasis","Price used for G:"],
+ ["#howF","ΔP = G × P × C / 100 &nbsp;·&nbsp; G = (P<sub>carriage</sub> − P<sub>reference</sub>) / P<sub>reference</sub> × 100"],
  ["#howR","G is rounded to the chosen number of decimal places (round half up) before being multiplied by C. That rounded G is also the one compared with the threshold."],
- ["#howL","<li><b>Manual:</b> the price you enter, in €/litre. <b>Day:</b> the price for the first date in the spreadsheet on or after the chosen day. <b>Week:</b> the price for the week (Monday to Sunday) containing the chosen day. <b>Month:</b> simple average of the weeks whose date in the spreadsheet falls in that month. <b>Calendar month:</b> each day of the month takes the price of the first published week on or after that day (as in “Day”) and all calendar days of the month are averaged.</li><li><b>Price for G (automatic):</b> carriage from 16/04/2026, Pmed (pump price excl. VAT and, for MAM ≥ 7.5 t, excluding the professional diesel refund); from 22/03 to 15/04/2026, pre-tax price; earlier, pump price.</li><li><b>Coefficient C:</b> from 01/07/2026 (Royal Decree-law 18/2026) based on the Pmed at the time of carriage; from 16/04 to 30/06/2026 (Royal Decree-law 9/2026) based on the pre-tax price; earlier, a fixed coefficient per vehicle. If the carriage is entered by week or month, the same average price is used; with a manual price, that price.</li><li>Revision is mandatory when |G| ≥ 5% or a lower threshold agreed in writing, and always in continuous contracts at each billing period. Extraordinary diesel subsidies may not be taken into account.</li>"],
- ["#ct18T","RDL 18/2026 · Pmed (€/l)"],["#ct9T","RDL 9/2026 · Pre-tax price (€/l)"],
- ["#hLegal","Legal notice"],
- ["#legalShort","<b>For guidance only.</b> The result depends on the data you enter and Grupo Trimodos accepts no liability for decisions taken on the basis of it. For a claim or dispute, check it against the <a href=\"https://apps.fomento.gob.es/preciogasoleo/angular_proyecto/client/gasoleoCambio\" target=\"_blank\" rel=\"noopener\">Ministry’s official calculator</a> (in Spanish)."],
- ["#detLegalT","Applicable legislation"],
+ ["#howL","<li><b>Manual:</b> the price you enter, in €/litre. <b>Day:</b> the price for the first published date on or after the chosen day. <b>Week:</b> the price for the week (Monday to Sunday) containing the chosen day. <b>Month:</b> simple average of the weeks published in that month. <b>Calendar month:</b> each day of the month takes the price of the first published week on or after that day (as in “Day”) and all calendar days of the month are averaged.</li><li><b>Price for G (automatic):</b> carriage from 16/04/2026, Pmed (pump price excl. VAT and, for MAM ≥ 7.5 t, excluding the professional diesel refund); from 22/03 to 15/04/2026, pre-tax price; earlier, pump price.</li><li><b>Coefficient C:</b> from 01/07/2026 (Royal Decree-law 18/2026) based on the Pmed at the time of carriage; from 16/04 to 30/06/2026 (Royal Decree-law 9/2026) based on the pre-tax price; earlier, a fixed coefficient per vehicle. If the carriage is entered by week or month, the same average price is used; with a manual price, that price.</li><li>Revision is mandatory when |G| ≥ 5% or a lower threshold agreed in writing, and always in continuous contracts at each billing period. Extraordinary diesel subsidies may not be taken into account.</li>"],
+ ["#howWeeksT","Weeks used"],
+ ["#tbl thead","<tr><th>Week (Monday)</th><th>Pump price</th><th>Excl. VAT</th><th>Hydrocarbon tax</th><th>Pre-tax (PAI)</th><th>Prof. refund</th><th>Pmed ≥ 7.5 t</th><th>Pmed &lt; 7.5 t</th></tr>"],
+ ["#howCT","Coefficient C tables"],["#ct18T","RDL 18/2026 · Pmed (€/l)"],["#ct9T","RDL 9/2026 · Pre-tax price (€/l)"],
+ ["#howLawT","Legislation"],
  ["#legalRefs","Law 15/2009, art. 38 · Order FOM/1882/2012, condition 3.4 · Royal Decree-law 9/2026 · Royal Decree-law 18/2026"],
- ["#legalP1","The calculation applies the formula in condition 3.4 of Order FOM/1882/2012, as amended by Royal Decree-law 9/2026 and Royal Decree-law 18/2026, under the rules of article 38 of Law 15/2009 on contracts for the carriage of goods by land. Prices are the weekly figures for automotive diesel in Spain published by the Spanish Ministry of Transport and Sustainable Mobility."],
- ["#legalP2","Since Royal Decree-law 18/2026 came into force on 1 July 2026, the reference price used and the thresholds that set coefficient C have changed. <a href=\"https://www.transportes.gob.es/recursos_mfom/comodin/recursos/20260702_nota_metodologica_variacion_precio_transporte.pdf\" target=\"_blank\" rel=\"noopener\">Ministry methodological note (3/7/2026)</a> (in Spanish)."],
- ["#srcTxt","Prices: Spanish Ministry of Transport and Sustainable Mobility"],["#lnkMin","Official diesel price page ↗"],
- ["#footTxt","A tool by <b>Grupo Trimodos</b> · Stinsa · Transargi"],["#btnShareAppTxt","Share link"],["#btnInstall","Install app"]
+ ["#legalP1","The calculation applies the formula in condition 3.4 of Order FOM/1882/2012, as amended by Royal Decree-law 9/2026 and Royal Decree-law 18/2026, under the rules of article 38 of Law 15/2009 on contracts for the carriage of goods by land. Since Royal Decree-law 18/2026 came into force on 1 July 2026, the reference price used and the thresholds that set coefficient C have changed (Ministry methodological note of 3/7/2026)."],
+ ["#legalShort","<b>For guidance only.</b> The result depends on the data entered and Grupo Trimodos accepts no liability for decisions taken on the basis of it. For a claim or dispute, check it against the official calculator of the Spanish Ministry of Transport and Sustainable Mobility."],
+ ["#srcTxt","Prices: weekly automotive diesel prices in Spain published by the Spanish Ministry of Transport and Sustainable Mobility."],
+ ["#fAbout","We are a transport and logistics company specialising in intermodal transport. After more than 40 years of experience, we keep working towards the same goal: helping businesses optimise their logistics networks efficiently, closely and honestly."],
+ ["#fTalkT","Let’s talk"]
 ];
 let LANG=(()=>{try{const q=new URLSearchParams(location.search).get("lang");if(q==="en"||q==="es")return q;const v=localStorage.getItem("gasoleo-lang");if(v==="en"||v==="es")return v}catch(e){}return /^es\b/i.test(navigator.language||"es")?"es":"en"})();
 let L=TX[LANG];
@@ -674,15 +558,11 @@ function applyStatic(){
       if(!ES_ORIG.has(k))ES_ORIG.set(k,el.innerHTML);el.innerHTML=LANG==="en"?en:ES_ORIG.get(k);
     });
   }
-  document.documentElement.lang=LANG==="en"?"en-GB":"es-ES";document.title=L.title;
+  document.documentElement.lang=LANG==="en"?"en-GB":"es-ES";document.title=L.title;$("btnCopyMail").textContent=L.copyBtn;
   document.querySelectorAll(".lang button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.lang===LANG)));
-  $("ctaBtn").href=CONTACT_URL[LANG];
 }
 
-const MIN_URL="https://www.transportes.gob.es/transporte-terrestre/servicios-al-transportista/indice-de-variacion-semanal-de-los-precios-medios-del-gasoleo-en-espana";
 const $=id=>document.getElementById(id);
-// Enlaces a la propia web: dentro del iframe de Odoo se abren en la página completa; fuera, como siempre
-if(EMBED)document.querySelectorAll("a[data-site]").forEach(a=>{a.target="_top";a.removeAttribute("rel")});
 const DAY=864e5, EPOCH=Date.UTC(1899,11,30);
 const serialToMs=s=>EPOCH+s*DAY;
 const isoToMs=s=>{if(!s)return NaN;const[y,m,d]=s.split("-").map(Number);return Date.UTC(y,m-1,d)};
@@ -700,13 +580,8 @@ const pick=(t,v)=>{for(const[lim,c]of t)if(v<lim)return c;return t[t.length-1][1
 
 // ---- Datos ----
 let SEED;
-try{
-  const peticion=fetch("../data.json?t="+Date.now(),{cache:"no-store"}).then(r=>{if(!r.ok)throw new Error(r.status);return r.json()});
-  // En el iframe no hay pantalla de inicio: el loader solo aparece si los precios tardan
-  SEED=await(EMBED&&window.TrimodosLoader?TrimodosLoader.track(peticion,L.loading):peticion);
-  window.TrimodosLoader&&TrimodosLoader.ready();
-}
-catch(e){window.TrimodosLoader&&TrimodosLoader.ready();applyStatic();$("stMsg").hidden=false;$("stMsg").textContent=L.loadFail(e.message);return}
+try{const r=await fetch("../data.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)throw new Error(r.status);SEED=await r.json()}
+catch(e){applyStatic();$("stLast").textContent="—";$("stMsg").hidden=false;$("stMsg").textContent=L.loadFail(e.message);return}
 let DATA=SEED;
 let ROWS=[];
 function loadRows(){
@@ -843,12 +718,12 @@ function calc(){
   const dP=(pct!=null&&isFinite(S.price))?S.price*pct/100:null;
   $("rG").textContent=G==null?"—":pc(G,gd,true);
   $("rGs").textContent=BN(basis)+(basis==="pmed"?" · "+(ge?L.mmaGe:L.mmaLt):"");
-  $("rC").textContent=C==null?"—":nf(C,2);$("rCs").textContent=cNote;
+  $("rC").textContent=C==null?"—":nf(C,2);$("rCs").textContent=cNote?"("+cNote+")":"";
   $("rPct").textContent=pct==null?"—":pc(pct,2,true);
   $("rDP").textContent=dP==null?"—":(LANG==="en"?(dP>0?"+":dP<0?"−":"")+"€"+nf(Math.abs(dP),2):(dP>0?"+":"")+nf(dP,2)+" €");
   $("rNP").textContent=dP==null?"—":eur(S.price+dP);
   $("sNP").textContent=isFinite(S.price)?L.agreed(eur(S.price)):"";
-  $("rFormula").textContent=(G!=null&&C!=null)?((nd==null?L.fNoRound(pc(G0,6)):L.fRound(pc(G0,6)))+"ΔP = "+nf(G,gd)+" × "+(isFinite(S.price)?nf(S.price,2):"P")+" × "+nf(C,2)+" / 100"):"";
+  $("rFormula").textContent=(G!=null&&C!=null)?((nd==null?L.fNoRound(pc(G0,6)):L.fRound(pc(G0,6)))+"ΔP = "+nf(G,gd)+" × "+(isFinite(S.price)?nf(S.price,2):"P")+" × "+nf(C,2)+" / 100"):"—";
   const v=$("rVerdict"),thr=isFinite(S.thr)?S.thr:5;
   let vt,vc;
   if(G==null){vc="info";vt=L.vMissing}
@@ -864,7 +739,7 @@ function calc(){
   drawChart();drawTable();
 }
 
-// ---- Gráfica ----
+// ---- Gráfica (dentro de un desplegable: se vuelve a dibujar al abrirlo) ----
 function drawChart(){
   const svg=$("svg");const{basis,ge,wr,wt}=LAST;
   const W=Math.max(320,svg.clientWidth||900),H=260,m={l:52,r:14,t:12,b:28};
@@ -887,12 +762,13 @@ function drawChart(){
   const MES=L.mShort;
   while(cur<b){const d=new Date(cur);if(d.getUTCMonth()%every===0){const xx=x(cur);h+=`<line x1="${xx}" x2="${xx}" y1="${H-m.b}" y2="${H-m.b+4}" stroke="var(--muted)"/><text x="${xx}" y="${H-8}" text-anchor="middle">${MES[d.getUTCMonth()]} ${String(d.getUTCFullYear()).slice(2)}</text>`}cur=Date.UTC(d.getUTCFullYear(),d.getUTCMonth()+1,1)}
   const path=pts.map((p,i)=>(i?"L":"M")+x(p.ms).toFixed(1)+" "+y(p.v).toFixed(1)).join(" ");
-  h+=`<path d="${path} L${x(pts[pts.length-1].ms).toFixed(1)} ${H-m.b} L${x(pts[0].ms).toFixed(1)} ${H-m.b} Z" fill="var(--chart)" opacity=".06"/>`;
-  h+=`<path d="${path}" fill="none" stroke="var(--chart)" stroke-width="2"/>`;
-  const e=pts[pts.length-1];h+=`<circle cx="${x(e.ms)}" cy="${y(e.v)}" r="4" fill="var(--chart)"/>`;
+  h+=`<path d="${path} L${x(pts[pts.length-1].ms).toFixed(1)} ${H-m.b} L${x(pts[0].ms).toFixed(1)} ${H-m.b} Z" fill="var(--dark)" opacity=".06"/>`;
+  h+=`<path d="${path}" fill="none" stroke="var(--dark)" stroke-width="2"/>`;
+  const e=pts[pts.length-1];h+=`<circle cx="${x(e.ms)}" cy="${y(e.v)}" r="4" fill="var(--dark)"/>`;
   svg.innerHTML=h;
 }
 window.addEventListener("resize",()=>drawChart());
+$("detChart").addEventListener("toggle",()=>{if($("detChart").open)drawChart()});
 
 function drawTable(){
   const{wr,wt}=LAST;const set=new Map();
@@ -911,9 +787,9 @@ function drawCTables(){
 function renderStatus(){
   $("stLast").textContent=fmtDate(lastRow().ms);
   // El Ministerio publica una vez por semana. Si han pasado más de 17 días desde la última semana con precio,
-  // se avisa de forma neutra y se remite a la página oficial.
+  // se avisa de forma neutra.
   const msg=$("stMsg");
-  if(Date.now()>lastRow().ms+17*DAY){msg.hidden=false;msg.innerHTML=L.late(fmtDate(lastRow().ms),MIN_URL)}
+  if(Date.now()>lastRow().ms+17*DAY){msg.hidden=false;msg.textContent=L.late(fmtDate(lastRow().ms))}
   else{msg.hidden=true;msg.textContent=""}
 }
 applyStatic();sync();drawCTables();renderStatus();calc();
@@ -922,28 +798,16 @@ if(!advDefault())$("advBox").open=true;
 // ---- Idioma ----
 document.querySelectorAll(".lang button").forEach(b=>b.addEventListener("click",()=>{
   if(b.dataset.lang===LANG)return;LANG=b.dataset.lang;L=TX[LANG];try{localStorage.setItem("gasoleo-lang",LANG)}catch(e){}
-  $("shareMsg").textContent="";$("installMsg").hidden=true;applyStatic();drawCTables();renderStatus();calc();
+  $("shareMsg").textContent="";applyStatic();drawCTables();renderStatus();calc();
 }));
 
-// ---- Página independiente: compartir el enlace y app instalable (PWA). En el iframe de Odoo no se usan. ----
-if(!EMBED){
-  $("btnShareApp").addEventListener("click",async()=>{
-    const url=PUBLIC_URL[LANG],msg=$("installMsg");
-    if(navigator.share){try{await navigator.share({title:L.title,text:L.appText,url});return}catch(e){if(e&&e.name==="AbortError")return}}
-    try{await navigator.clipboard.writeText(url);msg.textContent=L.linkCopied}catch(e){msg.textContent=url}
-    msg.hidden=false;
-  });
-  // Versión de pruebas: sin service worker ni instalación
-  const STANDALONE=()=>matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
-  const IOS=/iPhone|iPad|iPod/i.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
-  let promptInstalar=null;
-  window.addEventListener("appinstalled",()=>{promptInstalar=null;$("btnInstall").hidden=true;$("installMsg").hidden=false;$("installMsg").textContent=L.installed});
-  $("btnInstall").addEventListener("click",async()=>{
-    if(promptInstalar){promptInstalar.prompt();const r=await promptInstalar.userChoice.catch(()=>null);if(r&&r.outcome==="accepted")$("btnInstall").hidden=true;promptInstalar=null;return}
-    $("installMsg").hidden=false;$("installMsg").textContent=L.iosHelp;
-  });
-  if(!navigator.onLine){$("installMsg").hidden=false;$("installMsg").textContent=L.offline}
-}
+// ---- Copiar el correo de contacto (sin abrir ninguna aplicación ni página) ----
+$("btnCopyMail").addEventListener("click",async()=>{
+  const b=$("btnCopyMail"),t=$("fMail").textContent.trim();
+  try{await navigator.clipboard.writeText(t);b.textContent=L.copyDone}
+  catch(e){const r=document.createRange();r.selectNodeContents($("fMail"));const s=getSelection();s.removeAllRanges();s.addRange(r)}
+  setTimeout(()=>{b.textContent=L.copyBtn},2000);
+});
 
 // ---- Compartir el resultado como imagen ----
 function monthName(v){if(!okMonth(v))return "—";const[y,m]=v.split("-").map(Number);return L.months[m-1].charAt(0).toUpperCase()+L.months[m-1].slice(1)+" "+y}
@@ -963,65 +827,64 @@ function specDetail(ws,spec){
 }
 function roundRect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
 function fitText(ctx,txt,maxW,size,weight,family){let s=size;do{ctx.font=`${weight} ${s}px ${family}`;s-=2}while(ctx.measureText(txt).width>maxW&&s>12);return txt}
-// El logotipo se carga aparte: en el iframe la cabecera está oculta
-function cargarLogo(){return new Promise(res=>{const im=new Image();im.onload=()=>res(im);im.onerror=()=>res(null);im.src="../img/trimodos.png"})}
+function cargarLogo(){return new Promise(res=>{const im=new Image();im.onload=()=>res(im);im.onerror=()=>res(null);im.src="../img/logo-trimodos.png"})}
 async function imagenResultado(){
-  const DISP='Mulish, "Segoe UI", sans-serif',BODY='Roboto, "Segoe UI", Arial, sans-serif',MONO='"IBM Plex Mono", Menlo, monospace';
-  try{await Promise.all(["500 20px Mulish","600 20px Mulish","700 20px Mulish","400 20px Roboto","500 20px Roboto","700 20px Roboto",'500 20px "IBM Plex Mono"'].map(f=>document.fonts.load(f)))}catch(e){}
+  const DISP='Mulish, "Segoe UI", sans-serif',BODY='Roboto, "Segoe UI", Arial, sans-serif';
+  try{await Promise.all(["500 20px Mulish","600 20px Mulish","700 20px Mulish","400 20px Roboto","500 20px Roboto"].map(f=>document.fonts.load(f)))}catch(e){}
   await document.fonts.ready;
   const logo=await cargarLogo();
   const W=1080,H=1350,c=document.createElement("canvas");c.width=W;c.height=H;const x=c.getContext("2d");
-  const INK="#212529",MUT="#6c757d",LINE="#dee2e6",DARK="#2d3142",SUN="#fddb00",RMUT="#c5c9d6";
+  const INK="#212529",MUT="#5c636a",CREAM="#ffeed4",SUN="#fcda00",SOFT="#3b3a2a";
   x.fillStyle="#fff";x.fillRect(0,0,W,H);
   // Semicírculo amarillo, como en grupotrimodos.com
   x.fillStyle=SUN;x.beginPath();x.arc(W-70,0,230,0,Math.PI);x.fill();
-  // Logotipo
-  if(logo){const h=60,w=logo.naturalWidth*h/logo.naturalHeight;x.drawImage(logo,60,58,w,h)}
-  else{x.fillStyle=INK;x.font=`600 40px ${DISP}`;x.fillText("GRUPO TRIMODOS",60,105)}
+  // Logotipo (el de la cabecera de la web)
+  if(logo){const h=84,w=logo.naturalWidth*h/logo.naturalHeight;x.drawImage(logo,46,40,w,h)}
+  else{x.fillStyle=INK;x.font=`500 40px ${DISP}`;x.fillText("GRUPO TRIMODOS",60,100)}
   // Título y datos del cálculo
-  x.fillStyle=INK;x.font=`600 56px ${DISP}`;x.fillText(L.imT1,60,250);x.fillText(L.imT2,60,318);
+  x.fillStyle=INK;x.font=`500 58px ${DISP}`;x.fillText(L.imT1,60,250);x.fillText(L.imT2,60,320);
   const veh=$("veh").options[$("veh").selectedIndex].text.replace(" · "," · "+L.imVeh+" ");
-  x.fillStyle=MUT;fitText(x,veh,W-120,28,400,BODY);x.fillText(veh,60,374);
+  x.fillStyle=MUT;fitText(x,veh,W-120,28,400,BODY);x.fillText(veh,60,376);
   const bas=BN(LAST.basis)+(LAST.basis==="pmed"?" ("+(LAST.ge?L.mmaGe:L.mmaLt)+")":"");
-  const usd=L.imUsed(bas);fitText(x,usd,W-120,24,400,BODY);x.fillText(usd,60,414);
-  // Tarjetas de precio: referencia (verde Stinsa) y realización (naranja Transargi)
-  const card=(cx,tag,bar,tagCol,tagBg,label,val,detail)=>{
+  const usd=L.imUsed(bas);fitText(x,usd,W-120,24,400,BODY);x.fillText(usd,60,416);
+  // Precios: referencia (verde Stinsa) y realización (naranja Transargi), sobre el crema de la web
+  const card=(cx,tag,dot,titleCol,label,val,detail)=>{
     const y=452,w=465,h=264;
-    x.save();roundRect(x,cx,y,w,h,18);x.fillStyle="#fff";x.fill();x.clip();x.fillStyle=bar;x.fillRect(cx,y,w,8);x.restore();
-    roundRect(x,cx,y,w,h,18);x.strokeStyle=LINE;x.lineWidth=2;x.stroke();
-    x.font=`700 20px ${DISP}`;const tw=x.measureText(tag).width;
-    x.fillStyle=tagBg;roundRect(x,cx+30,y+34,tw+28,38,6);x.fill();x.fillStyle=tagCol;x.fillText(tag,cx+44,y+60);
-    x.fillStyle=INK;fitText(x,label,w-60,32,600,DISP);x.fillText(label,cx+30,y+122);
-    x.font=`500 58px ${MONO}`;x.fillText(val,cx+30,y+196);const vw=x.measureText(val).width;
-    x.fillStyle=MUT;x.font=`400 24px ${BODY}`;x.fillText(L.unit,cx+42+vw,y+196);
-    fitText(x,detail,w-60,22,400,BODY);x.fillText(detail,cx+30,y+236);
+    roundRect(x,cx,y,w,h,16);x.fillStyle=CREAM;x.fill();
+    x.fillStyle=dot;x.beginPath();x.arc(cx+38,y+48,8,0,Math.PI*2);x.fill();
+    x.fillStyle=MUT;x.font=`700 20px ${DISP}`;x.fillText(tag,cx+56,y+55);
+    x.fillStyle=titleCol;fitText(x,label,w-60,32,600,DISP);x.fillText(label,cx+30,y+112);
+    x.fillStyle=INK;x.font=`600 60px ${DISP}`;x.fillText(val,cx+30,y+192);const vw=x.measureText(val).width;
+    x.fillStyle=MUT;x.font=`400 24px ${BODY}`;x.fillText(L.unit,cx+42+vw,y+192);
+    fitText(x,detail,w-60,22,400,BODY);x.fillText(detail,cx+30,y+234);
   };
-  card(60,L.imRef,"#009e91","#00756b","#e3f4f2",specLabel(S.ref),nf(LAST.rv,5),specDetail(LAST.wr,S.ref));
-  card(555,L.imReal,"#f17e49","#a8461a","#fdeee6",specLabel(S.real),nf(LAST.tv,5),specDetail(LAST.wt,S.real));
-  // Resultado
+  card(60,L.imRef,"#009e91","#008a7e",specLabel(S.ref),nf(LAST.rv,5),specDetail(LAST.wr,S.ref));
+  card(555,L.imReal,"#f17e49","#c8551f",specLabel(S.real),nf(LAST.tv,5),specDetail(LAST.wt,S.real));
+  // Resultado sobre amarillo
   const ry=748,rh=404;
-  x.save();roundRect(x,60,ry,W-120,rh,24);x.fillStyle=DARK;x.fill();x.clip();
-  x.strokeStyle="rgba(253,219,0,.22)";x.lineWidth=26;x.beginPath();x.arc(W-60,ry,150,0,Math.PI*2);x.stroke();x.restore();
-  x.fillStyle=SUN;x.font=`700 24px ${DISP}`;x.fillText(L.imBig,100,ry+66);
-  x.fillStyle="#fff";x.font=`700 120px ${DISP}`;x.fillText(LAST.pct==null?"—":pc(LAST.pct,2,true),94,ry+182);
-  x.fillStyle="rgba(255,255,255,.18)";x.fillRect(100,ry+216,W-200,2);
-  x.fillStyle=SUN;x.font=`700 20px ${DISP}`;x.fillText(L.imDP,100,ry+262);x.fillText(L.imNP,580,ry+262);
+  x.save();roundRect(x,60,ry,W-120,rh,24);x.fillStyle=SUN;x.fill();x.clip();
+  x.fillStyle="rgba(255,255,255,.3)";x.beginPath();x.arc(W-90,ry+rh+40,250,0,Math.PI*2);x.fill();x.restore();
+  x.fillStyle=INK;x.font=`700 24px ${DISP}`;x.fillText(L.imBig,100,ry+66);
+  x.font=`600 120px ${DISP}`;x.fillText(LAST.pct==null?"—":pc(LAST.pct,2,true),94,ry+182);
+  x.fillStyle="rgba(33,37,41,.2)";x.fillRect(100,ry+216,W-200,2);
+  x.fillStyle=INK;x.font=`700 20px ${DISP}`;x.fillText(L.imDP,100,ry+262);x.fillText(L.imNP,580,ry+262);
   const dps=LAST.dP==null?"—":(LANG==="en"?(LAST.dP>0?"+":LAST.dP<0?"−":"")+"€"+nf(Math.abs(LAST.dP),2):(LAST.dP>0?"+":"")+nf(LAST.dP,2)+" €");
-  x.fillStyle="#fff";fitText(x,dps,440,56,700,DISP);x.fillText(dps,98,ry+324);
-  const nps=LAST.np==null?"—":eur(LAST.np);fitText(x,nps,400,56,700,DISP);x.fillText(nps,578,ry+324);
-  x.fillStyle=RMUT;const gc=L.imGC(LAST.G==null?"—":pc(LAST.G,LAST.gd,true),LAST.C==null?"—":nf(LAST.C,2),LAST.cNote);
+  fitText(x,dps,440,56,600,DISP);x.fillText(dps,98,ry+324);
+  const nps=LAST.np==null?"—":eur(LAST.np);fitText(x,nps,400,56,600,DISP);x.fillText(nps,578,ry+324);
+  x.fillStyle=SOFT;const gc=L.imGC(LAST.G==null?"—":pc(LAST.G,LAST.gd,true),LAST.C==null?"—":nf(LAST.C,2),LAST.cNote);
   fitText(x,gc,W-200,22,400,BODY);x.fillText(gc,100,ry+370);
-  // Veredicto, fuente y dirección pública
+  // Veredicto, fuente y web
   x.fillStyle=LAST.verdictOk?"#146c43":"#a8461a";fitText(x,LAST.verdict[0],W-120,30,700,DISP);x.fillText(LAST.verdict[0],60,1204);
   x.fillStyle=INK;fitText(x,LAST.verdict[1],W-120,22,400,BODY);x.fillText(LAST.verdict[1],60,1240);
   x.fillStyle=MUT;const pie=L.imFoot(fmtDate(lastRow().ms));fitText(x,pie,W-120,19,400,BODY);x.fillText(pie,60,1280);
-  x.fillStyle=DARK;x.font=`500 24px ${BODY}`;x.fillText(L.pubHost,60,1316);
-  x.fillStyle=SUN;x.fillRect(60+x.measureText(L.pubHost).width+16,1306,40,6);
+  x.fillStyle=INK;x.font=`600 26px ${DISP}`;x.fillText(L.pubHost,60,1318);
+  x.fillStyle=SUN;x.fillRect(60+x.measureText(L.pubHost).width+16,1307,40,6);
   return await new Promise(res=>c.toBlob(res,"image/png"));
 }
+// Dirección de esta calculadora (la que abre el botón de la web), para el texto que acompaña a la imagen
+const calcUrl=()=>location.origin+location.pathname.replace(/index\.html$/,"")+(LANG==="en"?"?lang=en":"");
 function textoResultado(){
-  const dps=$("rDP").textContent;
-  return L.txt({ref:specLabel(S.ref),rv:nf(LAST.rv,5),real:specLabel(S.real),tv:nf(LAST.tv,5),G:pc(LAST.G,LAST.gd,true),C:nf(LAST.C,2),pct:pc(LAST.pct,2,true),dP:dps,np:LAST.np==null?"—":eur(LAST.np),url:PUBLIC_URL[LANG]});
+  return L.txt({ref:specLabel(S.ref),rv:nf(LAST.rv,5),real:specLabel(S.real),tv:nf(LAST.tv,5),G:pc(LAST.G,LAST.gd,true),C:nf(LAST.C,2),pct:pc(LAST.pct,2,true),dP:$("rDP").textContent,np:LAST.np==null?"—":eur(LAST.np),url:calcUrl()});
 }
 function descargar(blob){
   const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=L.file;document.body.appendChild(a);a.click();a.remove();
@@ -1030,7 +893,6 @@ function descargar(blob){
 // Móvil: menú de compartir del sistema (WhatsApp, etc.).
 // Ordenador: copiar la imagen al portapapeles para pegarla con Ctrl+V. El menú de compartir de Windows
 // tiene una opción «Copiar» que no deja la imagen en el portapapeles, por eso no se usa en el ordenador.
-// En el iframe de Odoo hacen falta los permisos allow="clipboard-write; web-share" (ver README).
 const ES_MOVIL=()=>matchMedia("(pointer:coarse)").matches&&/Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
 $("btnShare").addEventListener("click",async()=>{
   const btn=$("btnShare"),msg=$("shareMsg");msg.textContent="";
@@ -1055,8 +917,8 @@ $("btnShare").addEventListener("click",async()=>{
     const blob=await blobP;
     if(copiado){
       msg.textContent=L.copied+" ";
-      const link=document.createElement("a");link.href="#";link.textContent=L.download;
-      link.addEventListener("click",ev=>{ev.preventDefault();descargar(blob)});msg.appendChild(link);
+      const link=document.createElement("button");link.type="button";link.textContent=L.download;
+      link.addEventListener("click",()=>descargar(blob));msg.appendChild(link);
     }else{
       descargar(blob);
       try{await navigator.clipboard.writeText(textoResultado());msg.textContent=L.dlCopied}catch(e){msg.textContent=L.dl}
