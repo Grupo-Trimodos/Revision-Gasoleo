@@ -3,6 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<script>
+// Modo incrustado: dentro de un iframe (página «Herramientas» de grupotrimodos.com) o con ?embed=1.
+// Se marca <html class="embedded"> antes de pintar nada, para que no aparezcan y desaparezcan la cabecera y el pie.
+(function(){var e=/[?&]embed=1(&|$)/.test(location.search);try{e=e||window.self!==window.top}catch(x){e=true}if(e)document.documentElement.classList.add("embedded")})();
+</script>
 <title>Calculadora de revisión del precio del transporte por gasóleo · Grupo Trimodos</title>
 <meta name="description" content="Calcula la revisión obligatoria del precio del transporte por carretera cuando varía el precio del gasóleo (Ley 15/2009, art. 38), con los precios semanales oficiales del Ministerio de Transportes.">
 <link rel="canonical" href="https://grupo-trimodos.github.io/Revision-Gasoleo/">
@@ -211,6 +216,14 @@ tr.in-real td{background:var(--band-b)}
 .btn-mini{font:400 13px/1 var(--f-body);border:1px solid var(--field-line);background:var(--white);color:var(--ink);border-radius:var(--r-pill);padding:4px 10px;cursor:pointer;margin-left:8px;vertical-align:1px}
 .btn-mini:hover{border-color:var(--ink)}
 .copy{font-size:15px;color:var(--muted-2)}
+
+/* Modo incrustado (iframe en grupotrimodos.com/herramientas/calculadora-gasoleo): la cabecera con el logotipo,
+   el selector de idioma y el pie los pone la web. Fondo transparente y el encabezado empieza arriba con un respiro.
+   El contenedor es el mismo de la web, así que las columnas quedan alineadas con las de Odoo. */
+html.embedded,html.embedded body{background:transparent}
+html.embedded .site-head,html.embedded .foot,html.embedded .skip{display:none}
+html.embedded .hero-in{padding-block:28px 32px}
+@media (max-width:575.98px){html.embedded .hero-in{padding-block:24px 28px}}
 
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -425,6 +438,10 @@ tr.in-real td{background:var(--band-b)}
 (async function(){
 "use strict";
 
+const EMBED=document.documentElement.classList.contains("embedded");
+// Dirección pública de la calculadora en la web (pie de la imagen y texto que se comparte)
+const PUBLIC_URL={es:"https://www.grupotrimodos.com/herramientas/calculadora-gasoleo",en:"https://www.grupotrimodos.com/en/herramientas/calculadora-gasoleo"};
+
 // ---- Idiomas: español (España) e inglés (Reino Unido) ----
 const TX={
  es:{loc:"es-ES",pct:" %",
@@ -457,7 +474,7 @@ const TX={
   imRef:"REFERENCIA",imReal:"REALIZACIÓN",unit:"€/litro",imBig:"VARIACIÓN DEL PRECIO DEL TRANSPORTE",
   imDP:"IMPORTE A REVISAR",imNP:"NUEVO PRECIO",imGC:(g,c,n)=>"Gasóleo (G) "+g+" · Coeficiente C "+c+(n?" ("+n+")":""),
   imFoot:d=>"Precios: Ministerio de Transportes y Movilidad Sostenible (datos a "+d+") · Ley 15/2009, art. 38 · Cálculo orientativo",
-  pubHost:"grupotrimodos.com",
+  pubHost:"grupotrimodos.com/herramientas/calculadora-gasoleo",
   txt:o=>`Revisión del precio del transporte por gasóleo\nReferencia (${o.ref}): ${o.rv} €/l\nRealización (${o.real}): ${o.tv} €/l\nVariación del gasóleo (G): ${o.G}\nCoeficiente C: ${o.C}\nVariación del transporte: ${o.pct}\nImporte a revisar: ${o.dP} · Nuevo precio: ${o.np}\n${o.url}`,
   needDates:"Completa las fechas para tener un resultado que compartir.",preparing:"Preparando…",shareBtn:"Compartir resultado",shareTitle:"Revisión del precio por gasóleo",
   dlCopied:"Imagen descargada y resumen copiado. Adjunta la imagen en WhatsApp o en el correo.",dl:"Imagen descargada. Adjúntala en WhatsApp o en el correo.",
@@ -494,7 +511,7 @@ const TX={
   imRef:"REFERENCE",imReal:"CARRIAGE",unit:"€/litre",imBig:"CHANGE IN HAULAGE PRICE",
   imDP:"AMOUNT TO REVISE",imNP:"NEW PRICE",imGC:(g,c,n)=>"Diesel (G) "+g+" · Coefficient C "+c+(n?" ("+n+")":""),
   imFoot:d=>"Prices: Spanish Ministry of Transport and Sustainable Mobility (data to "+d+") · Law 15/2009, art. 38 · For guidance only",
-  pubHost:"grupotrimodos.com",
+  pubHost:"grupotrimodos.com/en/herramientas/calculadora-gasoleo",
   txt:o=>`Haulage price revision for diesel price changes\nReference (${o.ref}): €${o.rv}/l\nCarriage (${o.real}): €${o.tv}/l\nChange in diesel price (G): ${o.G}\nCoefficient C: ${o.C}\nChange in haulage price: ${o.pct}\nAmount to revise: ${o.dP} · New price: ${o.np}\n${o.url}`,
   needDates:"Fill in the dates to get a result to share.",preparing:"Preparing…",shareBtn:"Share result",shareTitle:"Haulage price revision for diesel",
   dlCopied:"Image downloaded and summary copied. Attach the image in WhatsApp or an email.",dl:"Image downloaded. Attach it in WhatsApp or an email.",
@@ -545,7 +562,9 @@ const STATIC_EN=[
  ["#fAbout","We are a transport and logistics company specialising in intermodal transport. After more than 40 years of experience, we keep working towards the same goal: helping businesses optimise their logistics networks efficiently, closely and honestly."],
  ["#fTalkT","Let’s talk"]
 ];
-let LANG=(()=>{try{const q=new URLSearchParams(location.search).get("lang");if(q==="en"||q==="es")return q;const v=localStorage.getItem("gasoleo-lang");if(v==="en"||v==="es")return v}catch(e){}return /^es\b/i.test(navigator.language||"es")?"es":"en"})();
+// Idioma: ?lang=es|en → (incrustada) mensaje «trimodos:lang» de la web → (independiente) la última elección → navegador.
+// Dentro del iframe manda la web: no se lee ni se guarda «gasoleo-lang».
+let LANG=(()=>{try{const q=new URLSearchParams(location.search).get("lang");if(q==="en"||q==="es")return q;if(!EMBED){const v=localStorage.getItem("gasoleo-lang");if(v==="en"||v==="es")return v}}catch(e){}return /^es\b/i.test(navigator.language||"es")?"es":"en"})();
 let L=TX[LANG];
 const ES_ORIG=new Map();
 function applyStatic(){
@@ -561,6 +580,56 @@ function applyStatic(){
 }
 
 const $=id=>document.getElementById(id);
+
+// ---- Modo incrustado: comunicación con la página de grupotrimodos.com ----
+// La calculadora envía {type:"trimodos:height",height} y {type:"trimodos:scrollTo",top};
+// la web puede enviar {type:"trimodos:lang",lang:"es"|"en"}. Solo con los orígenes de la web, nunca con "*".
+const PADRES=["https://www.grupotrimodos.com","https://grupotrimodos.com"];
+// Para probar en local (calculadora servida desde localhost) se admite también una página padre en localhost.
+const LOCAL=/^(localhost|127\.0\.0\.1)$/.test(location.hostname);
+const padreOk=o=>PADRES.includes(o)||(LOCAL&&/^http:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(o));
+let PADRE=null,LISTO=false;
+if(EMBED&&window.parent!==window){
+  try{const a=location.ancestorOrigins,o=a&&a.length?a[0]:(document.referrer?new URL(document.referrer).origin:"");if(padreOk(o))PADRE=o}catch(e){}
+  window.addEventListener("message",e=>{
+    if(e.source!==window.parent||!padreOk(e.origin))return;
+    PADRE=e.origin;
+    const d=e.data;
+    if(d&&d.type==="trimodos:lang")setLang(d.lang);
+    enviarAltura(true);
+  });
+}
+const aPadre=m=>{if(EMBED&&PADRE)window.parent.postMessage(m,PADRE)};
+// Altura del documento → página padre. Se mide en el siguiente fotograma (o a los 150 ms, por si el iframe está
+// fuera de pantalla y el navegador frena los fotogramas) y no se repite el mismo valor.
+let altoUlt=0,altoPend=false;
+function enviarAltura(forzar){
+  if(!EMBED||!PADRE)return;
+  if(forzar)altoUlt=0;
+  if(altoPend)return;altoPend=true;
+  const medir=()=>{if(!altoPend)return;altoPend=false;const h=Math.ceil(document.documentElement.getBoundingClientRect().height);if(h&&h!==altoUlt){altoUlt=h;aPadre({type:"trimodos:height",height:h})}};
+  requestAnimationFrame(medir);setTimeout(medir,150);
+}
+if(EMBED){
+  if("ResizeObserver" in window)new ResizeObserver(()=>enviarAltura()).observe(document.documentElement);
+  document.addEventListener("toggle",()=>enviarAltura(),true);   // abrir o cerrar cualquier <details>
+  window.addEventListener("load",()=>enviarAltura(true));
+}
+// Desplazar la vista hasta un elemento. Dentro del iframe lo hace la página padre, que sabe dónde está el iframe
+// y cuánto mide su cabecera fija. Úsala para cualquier desplazamiento que se añada a la calculadora.
+function irA(el){
+  if(EMBED&&PADRE)aPadre({type:"trimodos:scrollTo",top:Math.max(0,Math.round(el.getBoundingClientRect().top+window.scrollY))});
+  else el.scrollIntoView({behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth",block:"start"});
+}
+// Cambio de idioma en caliente: botones ES/EN (página independiente) o mensaje de la web (iframe)
+function setLang(l){
+  if((l!=="es"&&l!=="en")||l===LANG)return;
+  LANG=l;L=TX[LANG];
+  if(!EMBED){try{localStorage.setItem("gasoleo-lang",LANG)}catch(e){}}
+  if(!LISTO)return;   // si aún se están cargando los precios, se pinta ya en el idioma nuevo
+  $("shareMsg").textContent="";applyStatic();drawCTables();renderStatus();calc();enviarAltura();
+}
+
 const DAY=864e5, EPOCH=Date.UTC(1899,11,30);
 const serialToMs=s=>EPOCH+s*DAY;
 const isoToMs=s=>{if(!s)return NaN;const[y,m,d]=s.split("-").map(Number);return Date.UTC(y,m-1,d)};
@@ -579,7 +648,7 @@ const pick=(t,v)=>{for(const[lim,c]of t)if(v<lim)return c;return t[t.length-1][1
 // ---- Datos ----
 let SEED;
 try{const r=await fetch("data.json?t="+Date.now(),{cache:"no-store"});if(!r.ok)throw new Error(r.status);SEED=await r.json()}
-catch(e){applyStatic();$("stLast").textContent="—";$("stMsg").hidden=false;$("stMsg").textContent=L.loadFail(e.message);return}
+catch(e){applyStatic();$("stLast").textContent="—";$("stMsg").hidden=false;$("stMsg").textContent=L.loadFail(e.message);enviarAltura(true);return}
 let DATA=SEED;
 let ROWS=[];
 function loadRows(){
@@ -792,12 +861,10 @@ function renderStatus(){
 }
 applyStatic();sync();drawCTables();renderStatus();calc();
 if(!advDefault())$("advBox").open=true;
+LISTO=true;enviarAltura(true);
 
-// ---- Idioma ----
-document.querySelectorAll(".lang button").forEach(b=>b.addEventListener("click",()=>{
-  if(b.dataset.lang===LANG)return;LANG=b.dataset.lang;L=TX[LANG];try{localStorage.setItem("gasoleo-lang",LANG)}catch(e){}
-  $("shareMsg").textContent="";applyStatic();drawCTables();renderStatus();calc();
-}));
+// ---- Idioma (selector ES/EN de la página independiente; en el iframe está oculto) ----
+document.querySelectorAll(".lang button").forEach(b=>b.addEventListener("click",()=>setLang(b.dataset.lang)));
 
 // ---- Copiar el correo de contacto (sin abrir ninguna aplicación ni página) ----
 $("btnCopyMail").addEventListener("click",async()=>{
@@ -879,8 +946,8 @@ async function imagenResultado(){
   x.fillStyle=SUN;x.fillRect(60+x.measureText(L.pubHost).width+16,1307,40,6);
   return await new Promise(res=>c.toBlob(res,"image/png"));
 }
-// Dirección de esta calculadora (la que abre el botón de la web), para el texto que acompaña a la imagen
-const calcUrl=()=>location.origin+location.pathname.replace(/index\.html$/,"")+(LANG==="en"?"?lang=en":"");
+// Dirección pública de la calculadora en la web, para el texto que acompaña a la imagen
+const calcUrl=()=>PUBLIC_URL[LANG];
 function textoResultado(){
   return L.txt({ref:specLabel(S.ref),rv:nf(LAST.rv,5),real:specLabel(S.real),tv:nf(LAST.tv,5),G:pc(LAST.G,LAST.gd,true),C:nf(LAST.C,2),pct:pc(LAST.pct,2,true),dP:$("rDP").textContent,np:LAST.np==null?"—":eur(LAST.np),url:calcUrl()});
 }

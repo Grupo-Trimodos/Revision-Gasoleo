@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="es-ES">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Prueba local · Herramientas (simulación de Odoo)</title>
+<!--
+  Página de prueba que imita la web de Odoo (cabecera fija, contenedor de Bootstrap, bloques «Código incrustado» y pie)
+  y monta los dos bloques de esta carpeta tal cual, ejecutando sus scripts como hace Odoo.
+
+  Cómo usarla (hace falta un servidor local; desde file:// no se pueden leer los bloques):
+    1. En la raíz del repositorio:  python3 -m http.server 8731 --bind 127.0.0.1
+    2. Abrir:  http://localhost:8731/odoo/prueba-local.html?calc=http://127.0.0.1:8731/
+       (la página padre en «localhost» y la calculadora en «127.0.0.1» son orígenes distintos, como en la web real)
+  Parámetros:
+    ?pagina=herramientas | calculadora | ambas (por defecto)
+    ?lang=en        → <html lang="en-US">, como la versión inglesa de la web
+    ?calc=<url>     → dirección de la calculadora (por defecto, la publicada en GitHub Pages; esa solo
+                      envía su altura a grupotrimodos.com, así que en local hay que usar la copia local)
+-->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mulish:wght@400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap">
+<style>
+  *{box-sizing:border-box}
+  body{margin:0;font:400 16px/1.5 Roboto,sans-serif;color:#212529;background:#fff}
+  .container{width:100%;margin-inline:auto;padding-inline:15px}
+  @media (min-width:576px){.container{max-width:540px}}
+  @media (min-width:768px){.container{max-width:720px}}
+  @media (min-width:992px){.container{max-width:960px}}
+  @media (min-width:1200px){.container{max-width:1140px}}
+  @media (min-width:1400px){.container{max-width:1320px}}
+  .pt64{padding-top:64px}.pb64{padding-bottom:64px}.text-center{text-align:center}
+  .prueba{background:#212529;color:#fff;font:13px/1.4 Roboto,sans-serif;padding:6px 15px;display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center}
+  .prueba a{color:#fcda00}
+  header#top{position:sticky;top:0;z-index:50;background:#fff;height:56px;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+  header#top .container{height:100%;display:flex;align-items:center;justify-content:space-between;gap:16px}
+  header#top img{height:40px;display:block}
+  header#top nav{display:flex;align-items:center;gap:16px;font:400 16px Mulish,sans-serif;color:rgba(0,0,0,.65)}
+  header#top nav .act{color:#212529;border-bottom:2px solid #fcda00}
+  header#top .btn{background:#714b67;color:#fff;border-radius:.4rem;padding:6px 12px}
+  @media (max-width:991.98px){header#top nav span:not(.btn){display:none}}
+  footer#bottom{background:#f3f2f2}
+  footer#bottom .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:24px;padding:48px 15px 24px}
+  footer#bottom h5{font:700 18px Roboto,sans-serif;margin:0 0 12px}
+  footer#bottom p{margin:0;line-height:1.6}
+  footer#bottom .bajo{padding:0 15px 32px;display:flex;flex-wrap:wrap;gap:12px 24px;color:#5c636a}
+  footer#bottom .idioma a{color:#212529;margin-right:10px}
+  footer#bottom .idioma b{text-decoration:underline}
+</style>
+</head>
+<body>
+<div class="prueba" role="note"><b>PRUEBA LOCAL · simulación de Odoo</b>
+  <span>Página: <a href="?pagina=herramientas" data-k="pagina">Herramientas</a> · <a href="?pagina=calculadora" data-k="pagina">Calculadora</a> · <a href="?pagina=ambas" data-k="pagina">Ambas</a></span>
+</div>
+<header id="top" class="o_header_standard o_top_fixed_element">
+  <div class="container">
+    <img src="../img/logo-trimodos.png" alt="Grupo Trimodos">
+    <nav><span>Servicios</span><span>Stinsa</span><span>Transargi</span><span>Intraser</span><span class="act">Herramientas</span><span>Conócenos</span><span>Contáctenos</span><span class="btn">Contacto</span></nav>
+  </div>
+</header>
+<main>
+  <section class="s_embed_code text-center pt64 pb64" id="sec-herramientas"><div class="s_embed_code_embedded container"></div></section>
+  <section class="s_embed_code text-center pt64 pb64" id="sec-calculadora"><div class="s_embed_code_embedded container"></div></section>
+</main>
+<footer id="bottom" class="o_footer">
+  <div class="container cols">
+    <div><h5>Nuestros servicios</h5><p>Servicios<br>Stinsa<br>Transargi<br>Intraser<br>Herramientas</p></div>
+    <div><h5>¿Hablamos?</h5><p>Stinsa: +34 964 526 061<br>Transargi: +34 964 200 311</p></div>
+    <div><h5>Grupo Trimodos</h5><p>Somos una compañía de transportes y logística especializada en el transporte intermodal.</p></div>
+  </div>
+  <div class="container bajo"><span>Copyright © TRIMODOS, S.L</span><span class="idioma" id="idioma"></span></div>
+</footer>
+<script>
+(async function () {
+  var q = new URLSearchParams(location.search);
+  var en = q.get("lang") === "en";
+  // Como Odoo: la versión inglesa de la web lleva <html lang="en-US">
+  document.documentElement.lang = en ? "en-US" : "es-ES";
+  var pagina = q.get("pagina") || "ambas";
+  var calc = q.get("calc") || "https://grupo-trimodos.github.io/Revision-Gasoleo/";
+  // Enlaces de la barra de prueba y selector de idioma del pie (el único de la página, como en Odoo)
+  function conParam(k, v) { var p = new URLSearchParams(location.search); p.set(k, v); return "?" + p.toString(); }
+  document.querySelectorAll("a[data-k]").forEach(function (a) { a.href = conParam(a.dataset.k, new URLSearchParams(a.getAttribute("href").slice(1)).get(a.dataset.k)); });
+  document.getElementById("idioma").innerHTML = en
+    ? '<a href="' + conParam("lang", "es") + '">Español</a><b>English</b>'
+    : '<b>Español</b> <a href="' + conParam("lang", "en") + '">English</a>';
+  // Monta un bloque como lo hace el «Código incrustado» de Odoo: HTML tal cual y scripts ejecutados
+  async function montar(id, fichero, cambiar) {
+    var sec = document.getElementById(id);
+    var t = await (await fetch(fichero, { cache: "no-store" })).text();
+    if (cambiar) t = cambiar(t);
+    var host = sec.querySelector(".s_embed_code_embedded");
+    host.innerHTML = t;
+    host.querySelectorAll("script").forEach(function (viejo) { var s = document.createElement("script"); s.textContent = viejo.textContent; viejo.replaceWith(s); });
+  }
+  if (pagina === "calculadora") document.getElementById("sec-herramientas").remove();
+  else await montar("sec-herramientas", "bloque-herramientas.html");
+  if (pagina === "herramientas") document.getElementById("sec-calculadora").remove();
+  else await montar("sec-calculadora", "bloque-calculadora.html", function (t) { return t.split("https://grupo-trimodos.github.io/Revision-Gasoleo/").join(calc); });
+})();
+</script>
+</body>
+</html>

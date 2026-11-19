@@ -1,0 +1,76 @@
+<!--
+  Calculadora de revisión del precio del transporte por gasóleo · Grupo Trimodos
+  Pegar tal cual en un bloque «Código incrustado» de Odoo, en la página /herramientas/calculadora-gasoleo.
+
+  - El idioma sale de la propia página de Odoo (/en/… → inglés): no hay que traducir nada.
+  - La calculadora envía su altura y el iframe se ajusta: sin barra de desplazamiento propia.
+  - Solo se aceptan mensajes del origen de la calculadora (el de data-base) y del propio iframe.
+  - El estilo de abajo deja el bloque a ancho completo y sin márgenes de sección, para que las bandas
+    crema y amarilla de la calculadora lleguen a los bordes de la página.
+  - Si Odoo carga el bloque dos veces, cada iframe se inicia una sola vez y el oyente de mensajes es único.
+-->
+<style>
+  .s_embed_code:has(.tt-calc){padding-top:0!important;padding-bottom:0!important}
+  .s_embed_code:has(.tt-calc) .s_embed_code_embedded,
+  .s_embed_code:has(.tt-calc) > .container,
+  .s_embed_code:has(.tt-calc) > .container-fluid,
+  .s_embed_code:has(.tt-calc) > .o_container_small{max-width:none;width:100%;padding-left:0;padding-right:0}
+  .tt-calc{margin:0;padding:0}
+  .tt-calc-frame{display:block;width:100%;height:1600px;min-height:600px;border:0;overflow:hidden;background:transparent}
+</style>
+<div class="tt-calc">
+  <iframe class="tt-calc-frame" data-trimodos-calc
+    data-base="https://grupo-trimodos.github.io/Revision-Gasoleo/"
+    src="https://grupo-trimodos.github.io/Revision-Gasoleo/?embed=1&amp;lang=es"
+    title="Calculadora de revisión del precio del transporte por gasóleo"
+    loading="lazy" scrolling="no" allow="clipboard-write; web-share"></iframe>
+</div>
+<script>
+(function () {
+  "use strict";
+  // en_US, en-US, en-GB… → inglés; el resto → español
+  function idioma() { return /^en/i.test(document.documentElement.lang || "") ? "en" : "es"; }
+  function origenDe(f) { return new URL(f.getAttribute("data-base")).origin; }
+  function marcos() { return Array.prototype.slice.call(document.querySelectorAll("iframe[data-trimodos-calc]")); }
+  // Altura de la cabecera fija de Odoo (header#top), para que el desplazamiento no quede debajo de ella
+  function cabecera() {
+    var h = document.querySelector("header#top") || document.querySelector("header");
+    if (!h) return 0;
+    var pos = getComputedStyle(h).position;
+    var fija = pos === "fixed" || pos === "sticky" || h.classList.contains("o_top_fixed_element") || h.classList.contains("o_header_affixed");
+    return fija ? h.getBoundingClientRect().height : 0;
+  }
+  function iniciar(f) {
+    if (f.getAttribute("data-tt-listo")) return;
+    f.setAttribute("data-tt-listo", "1");
+    var lang = idioma(), url = new URL(f.getAttribute("data-base"));
+    url.searchParams.set("embed", "1");
+    url.searchParams.set("lang", lang);
+    if (f.src !== url.href) f.src = url.href;   // en español ya viene puesto; solo cambia para inglés
+    f.addEventListener("load", function () {
+      // Saludo con el idioma: así la calculadora conoce el origen de la página aunque el navegador no envíe referrer
+      try { f.contentWindow.postMessage({ type: "trimodos:lang", lang: lang }, origenDe(f)); } catch (e) {}
+      // Si en 8 s no ha llegado ninguna altura (script bloqueado, red lenta…), se deja una altura que lo muestre todo
+      setTimeout(function () { if (!f.getAttribute("data-tt-alto")) f.style.height = "4200px"; }, 8000);
+    });
+  }
+  marcos().forEach(iniciar);
+  if (window.__trimodosCalc) return;
+  window.__trimodosCalc = true;
+  window.addEventListener("message", function (e) {
+    var f = marcos().filter(function (x) { return x.contentWindow === e.source; })[0];
+    if (!f || e.origin !== origenDe(f)) return;
+    var d = e.data || {};
+    if (d.type === "trimodos:height") {
+      var h = Math.ceil(Number(d.height));
+      if (h > 200 && h < 30000) { f.style.height = h + "px"; f.setAttribute("data-tt-alto", "1"); }
+    } else if (d.type === "trimodos:scrollTo") {
+      var top = Number(d.top);
+      if (!isFinite(top)) return;
+      var destino = f.getBoundingClientRect().top + window.pageYOffset + top - cabecera() - 12;
+      var suave = !(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
+      window.scrollTo({ top: Math.max(0, destino), behavior: suave ? "smooth" : "auto" });
+    }
+  });
+})();
+</script>
