@@ -137,6 +137,9 @@ input::-webkit-datetime-edit{padding:0}
 .checks{display:flex;flex-wrap:wrap;gap:10px 32px}
 .check{display:flex;gap:10px;align-items:flex-start;font-size:16px;line-height:1.4;cursor:pointer}
 .check input{width:18px;height:18px;min-height:0;margin:2px 0 0;flex:none;accent-color:var(--dark)}
+/* «Fijar el coeficiente C a mano»: la casilla y, al marcarla, el valor de C en la misma línea */
+.cman{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;min-height:40px}
+.cman-val input{width:96px;text-align:center;font-variant-numeric:tabular-nums}
 
 /* Resultado, sobre la banda amarilla */
 .band-sun{background:var(--sun);position:relative;overflow:hidden;isolation:isolate}
@@ -211,6 +214,15 @@ tr.in-real td{background:var(--band-b)}
 .ctable table td,.ctable table th{text-align:left;white-space:normal}
 .legal{display:grid;gap:8px;font-size:14px;color:var(--muted-2);max-width:92ch}
 .legal b{color:var(--ink);font-weight:500}
+.legal p{text-wrap:pretty}
+.nw{white-space:nowrap}
+/* Normativa: cada norma salta entera a la línea siguiente, nunca se parte por la mitad. El punto separador va
+   delante de cada norma y el que cae al principio de una línea queda fuera de la vista (margen negativo + overflow). */
+.norms{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:.5em}
+.norms>b{flex:none}
+.norms-w{flex:1 1 300px;min-width:0;overflow:hidden}
+.norms ul{list-style:none;margin:0 0 0 -1.4em;padding:0;display:flex;flex-wrap:wrap}
+.norms li::before{content:"·";display:inline-block;width:1.4em;text-align:center}
 
 /* Pie, como el de la web */
 .foot{background:var(--gray)}
@@ -393,7 +405,10 @@ html.embedded .hero-in{padding-block:28px 32px}
         </div>
         <div class="checks">
           <label class="check" id="gpRow"><input type="checkbox" id="gp"><span id="gpTxt">Vehículo de MMA ≥ 7,5 t<span class="d-only"> (con devolución del gasóleo profesional)</span></span></label>
-          <label class="check"><input type="checkbox" id="cont"><span id="contTxt">Contrato de transporte continuado<span class="d-only"> (se revisa en cada facturación)</span></span></label>
+          <div class="cman">
+            <label class="check"><input type="checkbox" id="cMan"><span id="cManTxt">Fijar el coeficiente C a mano</span></label>
+            <span class="cman-val" id="cManBox" hidden><label for="cVal" class="sr-only">Coeficiente C</label><input type="number" id="cVal" min="0" max="1" step="0.05" inputmode="decimal"></span>
+          </div>
         </div>
       </section>
     </div>
@@ -423,7 +438,7 @@ html.embedded .hero-in{padding-block:28px 32px}
     <h2 class="sr-only" id="hMore">Más información</h2>
     <div class="acc">
       <details id="advBox">
-        <summary><span id="advT">Opciones avanzadas</span><span class="badge" id="advBadge" hidden>Modificadas</span><span class="sum-hint" id="advHint">Precio para calcular G, umbral, redondeo y coeficiente C</span></summary>
+        <summary><span id="advT">Opciones avanzadas</span><span class="badge" id="advBadge" hidden>Modificadas</span><span class="sum-hint" id="advHint">Precio para calcular G, umbral y redondeo</span></summary>
         <div class="acc-body">
           <div class="fields">
             <div class="field" style="flex:2 1 300px"><label for="basis">Precio para calcular G</label>
@@ -444,10 +459,6 @@ html.embedded .hero-in{padding-block:28px 32px}
                 <option value="3">3 decimales (42,573 %)</option>
                 <option value="4">4 decimales (42,5731 %)</option>
               </select></div>
-          </div>
-          <div class="checks" style="align-items:center">
-            <label class="check"><input type="checkbox" id="cMan"><span id="cManTxt">Fijar C a mano</span></label>
-            <div class="field" style="flex:0 1 140px" id="cManBox" hidden><label for="cVal">Coeficiente C</label><input type="number" id="cVal" min="0" max="1" step="0.05"></div>
           </div>
           <p class="hint" id="basisHint"></p>
         </div>
@@ -489,10 +500,10 @@ html.embedded .hero-in{padding-block:28px 32px}
     </div>
 
     <div class="legal">
-      <p class="d-only" id="legalNorms"><b>Normativa:</b> Ley 15/2009, art. 38 · Orden FOM/1882/2012, condición 3.4 · Real Decreto-ley 9/2026 (desde el 16/04/2026) · Real Decreto-ley 18/2026 (desde el 01/07/2026).</p>
+      <div class="norms" id="legalNorms"><b id="normsT">Normativa:</b><div class="norms-w"><ul id="normsL"><li>Ley&nbsp;15/2009, art.&nbsp;38</li><li>Orden FOM/1882/2012, condición&nbsp;3.4</li><li>Real <span class="nw">Decreto-ley</span>&nbsp;9/2026<span class="d-only"> (desde el&nbsp;16/04/2026)</span></li><li>Real <span class="nw">Decreto-ley</span>&nbsp;18/2026<span class="d-only"> (desde el&nbsp;01/07/2026)</span></li></ul></div></div>
       <p class="d-only" id="legalShort"><b>Resultado orientativo.</b> Depende de los datos introducidos y Grupo Trimodos no se hace responsable de las decisiones que se tomen a partir de él. Para una reclamación o un litigio, contrástalo con la calculadora oficial del Ministerio de Transportes y Movilidad Sostenible.</p>
       <p class="d-only" id="srcTxt">Precios: evolución semanal del gasóleo de automoción en España publicada por el Ministerio de Transportes y Movilidad Sostenible.</p>
-      <p class="m-only" id="legalM"><b>Resultado orientativo.</b> Grupo Trimodos no se hace responsable de las decisiones que se tomen a partir de él. Ley 15/2009, art. 38 · Precios del Ministerio de Transportes.</p>
+      <p class="m-only" id="legalM"><b>Resultado orientativo.</b> Grupo Trimodos no se hace responsable de las decisiones que se tomen a partir de él. Precios del <span class="nw">Ministerio de Transportes</span>.</p>
     </div>
   </section>
 </main>
@@ -541,7 +552,6 @@ const TX={
   eur:v=>v+" €",agreed:v=>"Precio pactado: "+v,
   fNoRound:g=>"Sin redondear (G = "+g+") · ",fRound:g=>"G sin redondear "+g+" · ",
   vMissing:["Faltan datos","Completa las fechas y el precio del gasóleo para ver el resultado."],
-  vCont:["Revisión obligatoria","En los contratos continuados el precio se revisa en cada facturación."],
   vThr:(t,g)=>["Revisión obligatoria","La variación del gasóleo ("+g+") alcanza el umbral del "+t+"."],
   vBelow:(t,g)=>["Revisión no obligatoria","La variación del gasóleo ("+g+") no alcanza el umbral del "+t+"."],
   live:(p,d,v)=>"Variación del precio del transporte: "+p+". Importe a revisar: "+d+". "+v+".",
@@ -578,7 +588,6 @@ const TX={
   eur:v=>"€"+v,agreed:v=>"Agreed price: "+v,
   fNoRound:g=>"Not rounded (G = "+g+") · ",fRound:g=>"G before rounding "+g+" · ",
   vMissing:["Data missing","Fill in the dates and the diesel price to see the result."],
-  vCont:["Revision required","In continuous contracts the price is revised at each billing period."],
   vThr:(t,g)=>["Revision required","The change in diesel price ("+g+") reaches the "+t+" threshold."],
   vBelow:(t,g)=>["Revision not required","The change in diesel price ("+g+") does not reach the "+t+" threshold."],
   live:(p,d,v)=>"Change in haulage price: "+p+". Amount to revise: "+d+". "+v+".",
@@ -618,17 +627,17 @@ const STATIC_EN=[
  ["#veh option[value=A]","A · MAM ≥ 20,000 kg (except construction)"],["#veh option[value=B]","B · MAM 3,500–20,000 kg (except construction)"],
  ["#veh option[value=C]","C · Construction vehicles, MAM &gt; 3,500 kg"],["#veh option[value=D]","D · MAM ≤ 3,500 kg"],
  ["label[for=price]","Agreed haulage price (€)"],
- ["#gpTxt","Vehicle with MAM ≥ 7.5 t<span class=\"d-only\"> (eligible for professional diesel refund)</span>"],["#contTxt","Continuous haulage contract<span class=\"d-only\"> (revised at each billing period)</span>"],
+ ["#gpTxt","Vehicle with MAM ≥ 7.5 t<span class=\"d-only\"> (eligible for professional diesel refund)</span>"],
  ["#hRes","Result"],["#kPct","Change in haulage price"],["#kDP","Amount to revise"],["#kNP","New price"],["#kG","Change in diesel price (G)"],["#kC","Coefficient C"],
  ["#btnShareTxt","Share result"],["#hMore","More information"],
- ["#advT","Advanced options"],["#advBadge","Changed"],["#advHint","Price used for G, threshold, rounding and coefficient C"],
+ ["#advT","Advanced options"],["#advBadge","Changed"],["#advHint","Price used for G, threshold and rounding"],
  ["label[for=basis]","Price used to calculate G"],
  ["#basis option[value=auto]","Automatic, based on date of carriage"],["#basis option[value=pmed]","Pmed (pump price excl. VAT and professional diesel refund)"],
  ["#basis option[value=pai]","Pre-tax price (PAI)"],["#basis option[value=pvpsin]","Pump price excl. VAT"],["#basis option[value=pvp]","Pump price"],
  ["label[for=thr]","Revision threshold (%)"],["label[for=rnd]","Rounding of G (decimal places of the %)"],
  ["#rnd option[value=none]","No rounding"],["#rnd option[value='0']","0 decimal places (43%)"],["#rnd option[value='1']","1 decimal place (42.6%)"],
  ["#rnd option[value='2']","2 decimal places (42.57%)"],["#rnd option[value='3']","3 decimal places (42.573%)"],["#rnd option[value='4']","4 decimal places (42.5731%)"],
- ["#cManTxt","Set C manually"],["label[for=cVal]","Coefficient C"],
+ ["#cManTxt","Set coefficient C manually"],["label[for=cVal]","Coefficient C"],
  ["#detChartT","Diesel price trend"],["#lgRef","Reference"],["#lgReal","Carriage"],["#svg","@aria:Chart of the weekly diesel price"],
  ["#detHowT","How it is calculated"],["#sumT","Your calculation"],["#lblBasis","Price used for G:"],
  ["#howF","ΔP = G × P × C / 100 &nbsp;·&nbsp; G = (P<sub>carriage</sub> − P<sub>reference</sub>) / P<sub>reference</sub> × 100"],
@@ -637,10 +646,11 @@ const STATIC_EN=[
  ["#howWeeksT","Weeks used"],
  ["#tbl thead","<tr><th>Week (Monday)</th><th>Pump price</th><th>Excl. VAT</th><th>Hydrocarbon tax</th><th>Pre-tax (PAI)</th><th>Prof. refund</th><th>Pmed ≥ 7.5 t</th><th>Pmed &lt; 7.5 t</th></tr>"],
  ["#howCT","Coefficient C tables"],["#ct18T","RDL 18/2026 · Pmed (€/l)"],["#ct9T","RDL 9/2026 · Pre-tax price (€/l)"],
- ["#legalNorms","<b>Legislation:</b> Law 15/2009, art. 38 · Order FOM/1882/2012, condition 3.4 · Royal Decree-law 9/2026 (from 16/04/2026) · Royal Decree-law 18/2026 (from 01/07/2026)."],
+ ["#normsT","Legislation:"],
+ ["#normsL","<li>Law&nbsp;15/2009, art.&nbsp;38</li><li>Order FOM/1882/2012, condition&nbsp;3.4</li><li>Royal <span class=\"nw\">Decree-law</span>&nbsp;9/2026<span class=\"d-only\"> (from&nbsp;16/04/2026)</span></li><li>Royal <span class=\"nw\">Decree-law</span>&nbsp;18/2026<span class=\"d-only\"> (from&nbsp;01/07/2026)</span></li>"],
  ["#legalShort","<b>For guidance only.</b> The result depends on the data entered and Grupo Trimodos accepts no liability for decisions taken on the basis of it. For a claim or dispute, check it against the official calculator of the Spanish Ministry of Transport and Sustainable Mobility."],
  ["#srcTxt","Prices: weekly automotive diesel prices in Spain published by the Spanish Ministry of Transport and Sustainable Mobility."],
- ["#legalM","<b>For guidance only.</b> Grupo Trimodos accepts no liability for decisions taken on the basis of this result. Law 15/2009, art. 38 · Prices from the Spanish Ministry of Transport."],
+ ["#legalM","<b>For guidance only.</b> Grupo Trimodos accepts no liability for decisions taken on the basis of this result. Prices from the <span class=\"nw\">Spanish Ministry of Transport</span>."],
  ["#fAbout","We are a transport and logistics company specialising in intermodal transport. After more than 40 years of experience, we keep working towards the same goal: helping businesses optimise their logistics networks efficiently, closely and honestly."],
  ["#fTalkT","Let’s talk"]
 ];
@@ -791,8 +801,9 @@ function specEnd(spec){
 const lastMs=lastRow().ms;
 const S={ref:{mode:"date",date:"2026-01-15",week:"2026-01-15",month:"2026-01",nat:"2026-01",man:"",mdate:""},
          real:{mode:"nat",date:msToIso(lastMs),week:msToIso(lastMs),month:msToIso(lastMs).slice(0,7),nat:msToIso(lastMs).slice(0,7),man:"",mdate:msToIso(lastMs)},
-         veh:"A",basis:"auto",price:1000,thr:5,rnd:"2",gp:true,cont:false,cMan:false,cVal:0.4};
+         veh:"A",basis:"auto",price:1000,thr:5,rnd:"2",gp:true,cMan:false,cVal:0.4};
 try{const s=JSON.parse(localStorage.getItem("gasoleo-calc")||"null");if(s){for(const k of["ref","real"])if(s[k]){const o=s[k];s[k]={...S[k],...o};if(!["manual","date","week","month","nat"].includes(s[k].mode))s[k].mode="date"}Object.assign(S,s)}}catch(e){}
+delete S.cont;   // la opción «Contrato continuado» ya no existe: se olvida si estaba guardada
 function save(){try{localStorage.setItem("gasoleo-calc",JSON.stringify(S))}catch(e){}}
 
 function bindPanel(key,panelId,prefix){
@@ -808,12 +819,12 @@ $("price").addEventListener("input",e=>{S.price=parseFloat(e.target.value);calc(
 $("thr").addEventListener("input",e=>{S.thr=parseFloat(e.target.value);advState();calc()});
 $("rnd").addEventListener("change",e=>{S.rnd=e.target.value;sync();calc()});
 $("gp").addEventListener("change",e=>{S.gp=e.target.checked;calc()});
-$("cont").addEventListener("change",e=>{S.cont=e.target.checked;calc()});
-$("cMan").addEventListener("change",e=>{S.cMan=e.target.checked;sync();calc()});
+// Al marcar «Fijar C a mano», el campo empieza con el C que se estaba usando (el automático)
+$("cMan").addEventListener("change",e=>{S.cMan=e.target.checked;if(S.cMan&&LAST.C!=null)S.cVal=LAST.C;sync();calc()});
 $("cVal").addEventListener("input",e=>{S.cVal=parseFloat(e.target.value);calc()});
 
-// Opciones avanzadas: aviso cuando no están en los valores por defecto (automático, 5 %, 2 decimales, C automático)
-const advDefault=()=>S.basis==="auto"&&S.thr===5&&S.rnd==="2"&&!S.cMan;
+// Opciones avanzadas: aviso cuando no están en los valores por defecto (automático, 5 %, 2 decimales)
+const advDefault=()=>S.basis==="auto"&&S.thr===5&&S.rnd==="2";
 function advState(){$("advBadge").hidden=advDefault()}
 function sync(){
   for(const[key,pid,pre]of[["ref","pRef","ref"],["real","pReal","real"]]){
@@ -824,7 +835,7 @@ function sync(){
   }
   $("veh").value=S.veh;$("basis").value=S.basis;$("price").value=isFinite(S.price)?S.price:"";$("thr").value=isFinite(S.thr)?S.thr:"";$("rnd").value=S.rnd;
   // La casilla de MMA ≥ 7,5 t solo se muestra cuando aplica (con A siempre lo es; con D, nunca)
-  $("gp").checked=S.gp;$("gp").disabled=S.veh==="A"||S.veh==="D";$("gpRow").hidden=$("gp").disabled;$("cont").checked=S.cont;
+  $("gp").checked=S.gp;$("gp").disabled=S.veh==="A"||S.veh==="D";$("gpRow").hidden=$("gp").disabled;
   $("cMan").checked=S.cMan;$("cManBox").hidden=!S.cMan;$("cVal").value=S.cVal;
   advState();
 }
@@ -889,7 +900,6 @@ function calc(){
   const v=$("rVerdict"),thr=isFinite(S.thr)?S.thr:5;
   let vt,vc;
   if(G==null){vc="info";vt=L.vMissing}
-  else if(S.cont){vc="ok";vt=L.vCont}
   else if(Math.abs(G)>=thr){vc="ok";vt=L.vThr(pc(thr,1),pc(G,gd,true))}
   else{vc="warn";vt=L.vBelow(pc(thr,1),pc(G,gd,true))}
   v.className="verdict "+vc;$("rVerdictI").textContent=vc==="ok"?"✓":vc==="warn"?"!":"–";$("rVerdictT").textContent=vt[0];$("rVerdictD").textContent=vt[1];
