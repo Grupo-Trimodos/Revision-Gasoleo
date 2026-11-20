@@ -76,7 +76,6 @@ h1{font-size:calc(1.425rem + 2.1vw)}
 .lang{display:inline-flex;height:38px;border:1px solid #dee2e6;border-radius:var(--r-btn);overflow:hidden;background:var(--white)}
 .lang button{border:0;background:var(--white);color:rgba(0,0,0,.65);font:400 16px/1 var(--f-display);padding:0 12px;min-width:44px;cursor:pointer}
 .lang button+button{border-left:1px solid #dee2e6}
-.lang button:hover{color:var(--ink)}
 .lang button[aria-pressed="true"]{background:var(--ink);color:#fff}
 .lang button:focus-visible{outline-offset:-3px}
 
@@ -107,19 +106,30 @@ h1{font-size:calc(1.425rem + 2.1vw)}
 .panel.real h2{color:var(--transargi-title)}
 .help{color:var(--muted);font-size:15px}
 .mode{display:grid;gap:6px}
-.seg{display:grid;grid-template-columns:repeat(5,1fr);border:1px solid var(--field-line);border-radius:var(--r-btn);overflow:hidden}
-.seg button{border:0;border-right:1px solid var(--line);background:var(--white);color:var(--ink);font:400 15px/1.15 var(--f-display);min-height:40px;padding:4px 2px;cursor:pointer;text-align:center}
+/* Selector de modo: columnas iguales cuando caben; si no, cada botón toma el ancho de su texto en una sola línea
+   («Mes natural» no se parte en dos). */
+.seg{display:grid;grid-template-columns:repeat(5,minmax(max-content,1fr));border:1px solid var(--field-line);border-radius:var(--r-btn);overflow:hidden}
+.seg button{border:0;border-right:1px solid var(--line);background:var(--white);color:var(--ink);font:400 15px/1.15 var(--f-display);min-height:40px;padding:4px 8px;cursor:pointer;text-align:center;white-space:nowrap;transition:background-color .15s ease-out,color .15s ease-out}
 .seg button:last-child{border-right:0}
-.seg button:hover{background:var(--gray)}
+.seg button:active{background:var(--gray)}
 .seg button[aria-pressed="true"]{background:var(--dark);color:#fff;font-weight:600}
 .seg button:focus-visible{outline-offset:-3px}
-@media (max-width:400px){.seg button{font-size:13.5px}}
+/* Si ni así caben (móvil muy estrecho, tableta con dos columnas, inglés), columnas iguales y el texto en dos líneas */
+.seg.tight{grid-template-columns:repeat(5,1fr)}
+.seg.tight button{white-space:normal;padding:4px 2px;font-size:13.5px;line-height:1.1}
 .fields{display:flex;flex-wrap:wrap;gap:16px}
-.field{display:grid;gap:6px;flex:1 1 200px;min-width:0}
+.field{display:grid;grid-template-columns:minmax(0,1fr);gap:6px;flex:1 1 200px;min-width:0}
 .lbl,.field label{font:400 16px/1.3 var(--f-body);color:var(--ink)}
-input,select{font:400 16px/1.5 var(--f-body);color:var(--ink);background:var(--white);border:1px solid var(--field-line);border-radius:var(--r-btn);padding:7px 12px;min-height:40px;width:100%;min-width:0}
-input:hover,select:hover{border-color:rgba(33,37,41,.5)}
+input,select{font:400 16px/1.5 var(--f-body);color:var(--ink);background:var(--white);border:1px solid var(--field-line);border-radius:var(--r-btn);padding:7px 12px;min-height:40px;width:100%;min-width:0;max-width:100%;margin:0;transition:border-color .15s ease-out,box-shadow .15s ease-out}
 input:focus,select:focus{outline:0;border-color:var(--dark);box-shadow:0 0 0 .25rem rgba(45,49,66,.18)}
+/* Desplegables con la misma altura y la misma flecha en todos los navegadores (Safari los dibujaba más bajos) */
+select{-webkit-appearance:none;appearance:none;padding-right:38px;text-overflow:ellipsis;background:var(--white) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M3.5 6l4.5 4.5L12.5 6' fill='none' stroke='%23212529' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 12px center/14px 14px}
+/* Fechas y meses: Safari en iPhone/iPad les pone un ancho mínimo propio y centra el texto, así que sobresalían
+   de la caja. Sin el aspecto nativo ocupan justo el ancho disponible; al tocarlos se sigue abriendo el selector. */
+input[type=date],input[type=month]{display:block}
+@supports (-webkit-touch-callout:none){input[type=date],input[type=month]{-webkit-appearance:none;appearance:none}}
+input::-webkit-date-and-time-value{text-align:left;margin:0}
+input::-webkit-datetime-edit{padding:0}
 .readout{display:flex;align-items:baseline;flex-wrap:wrap;gap:2px 10px;border-top:1px solid var(--line);padding-top:14px}
 .readout .big{font:600 30px/1.1 var(--f-display);font-variant-numeric:tabular-nums lining-nums}
 .readout .unit{color:var(--muted);font-size:15px}
@@ -155,8 +165,8 @@ input:focus,select:focus{outline:0;border-color:var(--dark);box-shadow:0 0 0 .25
 .res-sec .note{font-size:14px;color:var(--ink-soft)}
 @media (max-width:575.98px){.res-sec{column-gap:16px}.res-sec .sep{display:none}}
 .res-actions{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px}
-.btn-pill{display:inline-flex;align-items:center;justify-content:center;gap:10px;border:0;border-radius:var(--r-pill);padding:10px 28px;background:var(--white);color:var(--ink);font:400 18px/1.2 var(--f-display);cursor:pointer}
-.btn-pill:hover{background:var(--ink);color:#fff}
+.btn-pill{display:inline-flex;align-items:center;justify-content:center;gap:10px;border:0;border-radius:var(--r-pill);padding:10px 28px;background:var(--white);color:var(--ink);font:400 18px/1.2 var(--f-display);cursor:pointer;transition:transform .16s cubic-bezier(.23,1,.32,1),background-color .15s ease-out,color .15s ease-out}
+.btn-pill:active:not(:disabled){transform:scale(.97)}
 .btn-pill:disabled{opacity:.7;cursor:default}
 .btn-pill svg{width:18px;height:18px;flex:none}
 .share-msg{font-size:15px;flex:1 1 260px}
@@ -213,8 +223,18 @@ tr.in-real td{background:var(--band-b)}
 .units{margin-top:10px;font:500 16px var(--f-display)}
 .u-st{color:var(--stinsa-ink)} .u-ta{color:var(--transargi-ink)} .u-in{color:var(--intraser)}
 .btn-mini{font:400 13px/1 var(--f-body);border:1px solid var(--field-line);background:var(--white);color:var(--ink);border-radius:var(--r-pill);padding:4px 10px;cursor:pointer;margin-left:8px;vertical-align:1px}
-.btn-mini:hover{border-color:var(--ink)}
 .copy{font-size:15px;color:var(--muted-2)}
+
+/* Hover solo con ratón: en el móvil el último botón tocado no se queda «encendido» */
+@media (hover:hover){
+  .lang button:hover{color:var(--ink)}
+  .seg button:not([aria-pressed="true"]):hover{background:var(--gray)}
+  input:hover,select:hover{border-color:rgba(33,37,41,.5)}
+  input:focus:hover,select:focus:hover{border-color:var(--dark)}
+  .btn-pill:not(:disabled):hover{background:var(--ink);color:#fff}
+  .btn-mini:hover{border-color:var(--ink)}
+}
+button,summary,label,select,input{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 
 /* Modo incrustado (iframe en grupotrimodos.com/herramientas/calculadora-gasoleo): la cabecera con el logotipo,
    el selector de idioma y el pie los pone la web. Fondo transparente y el encabezado empieza arriba con un respiro.
@@ -230,34 +250,63 @@ html.embedded .hero-in{padding-block:28px 32px}
 @media (min-width:576px){.m-only{display:none!important}}
 @media (max-width:575.98px){
   .d-only{display:none!important}
-  .hero-in{padding-block:28px 24px;gap:10px}
-  .calc{padding-block:20px;gap:12px}.pair{gap:12px}
-  .box{padding:16px;gap:12px}
-  .box header{gap:4px}
+  /* Ritmo de 4/8 px: 24 entre bandas, 16 dentro de las cajas, 12 entre cajas, 8 entre etiqueta y campo */
+  .hero-in{padding-block:24px 24px;gap:8px}
+  .hero h1{font-size:30px;letter-spacing:-.01em}
+  .updated{font-size:14px}
+  .calc{padding-block:16px 24px;gap:12px}.pair{gap:12px}
+  .box{padding:16px;gap:14px}
+  .box header{gap:2px}
+  .kicker{font-size:12px}
+  .box .h4{font-size:21px}
   .help,.mode .lbl{display:none}
   .field[data-for=date] label,.field[data-for=month] label,.field[data-for=nat] label{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-  .readout{padding-top:10px}
+  /* Campos de 44 px (tamaño táctil) y texto a 16 px para que el iPhone no amplíe al tocarlos */
+  input,select{min-height:44px;padding:9px 12px}
+  .fields{gap:14px}
+  .field{gap:6px}
+  .field label{font:500 14px/1.3 var(--f-body);color:var(--muted-2)}
+  .seg{grid-template-columns:repeat(5,minmax(max-content,1fr))}
+  .seg button{min-height:44px;font-size:14px;padding:0 6px}
+  .readout{padding-top:12px;column-gap:8px}
   .readout .big{font-size:28px}
-  .readout .weeks{margin-top:2px;font-size:13.5px}
+  .readout .unit{font-size:14px}
+  .readout .weeks{margin-top:2px;font-size:13.5px;line-height:1.45}
   .readout .weeks:empty{display:none}
-  .checks{gap:10px}
+  .checks{gap:12px}
+  .check{font-size:15px;align-items:center;min-height:24px}
+  .check input{margin:0}
+  /* Resultado: cifra grande, línea, importe y nuevo precio en dos columnas, veredicto y G/C como un recibo */
   .res{padding-block:24px 28px;gap:16px}
-  .res-amounts{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-  .v{font-size:clamp(22px,6.4vw,30px)}
-  .verdict{padding:12px 14px}
+  .res-kicker{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .k{font-size:12px;letter-spacing:.08em}
+  .res-top{gap:16px}
+  .res-amounts{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;border-top:1px solid rgba(33,37,41,.18);padding-top:16px}
+  .v{font-size:clamp(22px,6.4vw,28px);margin-top:4px}
+  .v.xl{font-size:clamp(48px,14vw,60px);margin-top:8px}
+  .verdict{padding:12px 14px;gap:10px}
+  .verdict .v-ico{width:24px;height:24px;font-size:13px}
   .verdict .v-t{font-size:17px}
   .verdict:not(.info) .v-d{display:none}
   .verdict:not(.info){align-items:center}
-  .res-sec .note{display:none}
-  .more{padding-block:20px 28px;gap:20px}
-  .acc summary{font-size:18px;padding:14px 40px 14px 0}
+  .res-sec{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;font-size:15px}
+  .res-sec b{font-size:16px;text-align:right}
+  .res-sec .note,.res-sec .sep{display:none}
+  .res-actions .btn-pill{min-height:48px}
+  .more{padding-block:16px 28px;gap:20px}
+  .acc summary{font-size:18px;padding:16px 36px 16px 0}
+  .acc summary::after{right:6px;width:8px;height:8px}
   .sum-hint{display:none}
+  .badge{font-size:11px;padding:4px 8px}
   .acc-body{padding-bottom:20px}
-  .legal{font-size:13px}
+  .legal{font-size:13px;line-height:1.5}
   .foot-in{padding-block:28px 20px;gap:20px}
   .foot-cols{gap:20px}
+  .foot h2{font-size:17px;margin-bottom:8px}
+  .foot p{font-size:15px;line-height:1.6}
   .foot .about{display:none}
   .units{margin-top:0}
+  .copy{font-size:13px}
 }
 
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
@@ -610,7 +659,13 @@ function applyStatic(){
   }
   document.documentElement.lang=LANG==="en"?"en-GB":"es-ES";document.title=L.title;$("btnCopyMail").textContent=L.copyBtn;
   document.querySelectorAll(".lang button").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.lang===LANG)));
+  fitSeg();
 }
+// Selector de modo: cada botón en una línea si cabe; si no, clase «tight» (texto en dos líneas).
+// Se mide al cargar, al cambiar de idioma o de ancho y cuando terminan de cargar las fuentes.
+function fitSeg(){document.querySelectorAll(".seg").forEach(s=>{s.classList.remove("tight");if(s.scrollWidth>s.clientWidth+1)s.classList.add("tight")})}
+window.addEventListener("resize",()=>fitSeg());
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>fitSeg());
 
 const $=id=>document.getElementById(id);
 
