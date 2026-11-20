@@ -224,6 +224,42 @@ html.embedded .site-head,html.embedded .foot,html.embedded .skip{display:none}
 html.embedded .hero-in{padding-block:28px 32px}
 @media (max-width:575.98px){html.embedded .hero-in{padding-block:24px 28px}}
 
+/* Móvil (< 576 px): versión simplificada. Mismo aspecto, solo lo esencial: título corto, sin entradilla ni ayudas,
+   detalle de las semanas en una línea, resultado compacto, aviso legal en un párrafo y pie sin la presentación.
+   .d-only = solo en pantallas grandes · .m-only = solo en el móvil. */
+@media (min-width:576px){.m-only{display:none!important}}
+@media (max-width:575.98px){
+  .d-only{display:none!important}
+  .hero-in{padding-block:28px 24px;gap:10px}
+  .calc{padding-block:20px;gap:12px}.pair{gap:12px}
+  .box{padding:16px;gap:12px}
+  .box header{gap:4px}
+  .help,.mode .lbl{display:none}
+  .field[data-for=date] label,.field[data-for=month] label,.field[data-for=nat] label{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .readout{padding-top:10px}
+  .readout .big{font-size:28px}
+  .readout .weeks{margin-top:2px;font-size:13.5px}
+  .readout .weeks:empty{display:none}
+  .checks{gap:10px}
+  .res{padding-block:24px 28px;gap:16px}
+  .res-amounts{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+  .v{font-size:clamp(22px,6.4vw,30px)}
+  .verdict{padding:12px 14px}
+  .verdict .v-t{font-size:17px}
+  .verdict:not(.info) .v-d{display:none}
+  .verdict:not(.info){align-items:center}
+  .res-sec .note{display:none}
+  .more{padding-block:20px 28px;gap:20px}
+  .acc summary{font-size:18px;padding:14px 40px 14px 0}
+  .sum-hint{display:none}
+  .acc-body{padding-bottom:20px}
+  .legal{font-size:13px}
+  .foot-in{padding-block:28px 20px;gap:20px}
+  .foot-cols{gap:20px}
+  .foot .about{display:none}
+  .units{margin-top:0}
+}
+
 @media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -241,8 +277,8 @@ html.embedded .hero-in{padding-block:28px 32px}
 <main id="main" tabindex="-1">
   <section class="hero" aria-labelledby="hTitle">
     <div class="container hero-in">
-      <h1 id="hTitle">Calculadora de revisión del precio del transporte por gasóleo</h1>
-      <p class="lead" id="hLede">Calcula cuánto debe cambiar el precio de un transporte por carretera cuando sube o baja el gasóleo. Por ley (art. 38 de la Ley 15/2009), el precio se revisa cuando el gasóleo varía un 5 % o más entre la fecha del contrato y la del transporte.</p>
+      <h1 id="hTitle"><span class="d-only">Calculadora de revisión del precio del transporte por gasóleo</span><span class="m-only">Revisión del precio por gasóleo</span></h1>
+      <p class="lead d-only" id="hLede">Calcula cuánto debe cambiar el precio de un transporte por carretera cuando sube o baja el gasóleo. Por ley (art. 38 de la Ley 15/2009), el precio se revisa cuando el gasóleo varía un 5 % o más entre la fecha del contrato y la del transporte.</p>
       <p class="updated"><span id="lblUpdated">Precios oficiales actualizados a:</span> <b id="stLast">…</b></p>
       <p class="notice" id="stMsg" role="status" hidden></p>
     </div>
@@ -269,7 +305,7 @@ html.embedded .hero-in{padding-block:28px 32px}
             <div class="field" data-for="month"><label for="refMonth">Mes</label><input type="month" id="refMonth"></div>
             <div class="field" data-for="nat"><label for="refNat">Mes natural</label><input type="month" id="refNat"></div>
           </div>
-          <div class="readout"><span class="big" id="refVal">—</span><span class="unit">€/litro</span><p class="weeks" id="refWeeks"></p></div>
+          <div class="readout"><span class="big" id="refVal">—</span><span class="unit">€/litro</span><p class="weeks d-only" id="refWeeks"></p><p class="weeks m-only" id="refWeeksS"></p></div>
         </section>
 
         <section class="box panel real" id="pReal" aria-labelledby="hReal">
@@ -290,7 +326,7 @@ html.embedded .hero-in{padding-block:28px 32px}
             <div class="field" data-for="month"><label for="realMonth">Mes</label><input type="month" id="realMonth"></div>
             <div class="field" data-for="nat"><label for="realNat">Mes natural</label><input type="month" id="realNat"></div>
           </div>
-          <div class="readout"><span class="big" id="realVal">—</span><span class="unit">€/litro</span><p class="weeks" id="realWeeks"></p></div>
+          <div class="readout"><span class="big" id="realVal">—</span><span class="unit">€/litro</span><p class="weeks d-only" id="realWeeks"></p><p class="weeks m-only" id="realWeeksS"></p></div>
         </section>
       </div>
 
@@ -307,8 +343,8 @@ html.embedded .hero-in{padding-block:28px 32px}
           <div class="field"><label for="price">Precio pactado del transporte (€)</label><input type="number" id="price" min="0" step="0.01" inputmode="decimal"></div>
         </div>
         <div class="checks">
-          <label class="check" id="gpRow"><input type="checkbox" id="gp"><span id="gpTxt">Vehículo de MMA ≥ 7,5 t (con devolución del gasóleo profesional)</span></label>
-          <label class="check"><input type="checkbox" id="cont"><span id="contTxt">Contrato de transporte continuado (se revisa en cada facturación)</span></label>
+          <label class="check" id="gpRow"><input type="checkbox" id="gp"><span id="gpTxt">Vehículo de MMA ≥ 7,5 t<span class="d-only"> (con devolución del gasóleo profesional)</span></span></label>
+          <label class="check"><input type="checkbox" id="cont"><span id="contTxt">Contrato de transporte continuado<span class="d-only"> (se revisa en cada facturación)</span></span></label>
         </div>
       </section>
     </div>
@@ -321,7 +357,7 @@ html.embedded .hero-in{padding-block:28px 32px}
         <div><p class="k" id="kPct">Variación del precio del transporte</p><p class="v xl" id="rPct">—</p></div>
         <div class="res-amounts">
           <div><p class="k" id="kDP">Importe a revisar</p><p class="v" id="rDP">—</p></div>
-          <div><p class="k" id="kNP">Nuevo precio</p><p class="v" id="rNP">—</p><p class="s" id="sNP"></p></div>
+          <div><p class="k" id="kNP">Nuevo precio</p><p class="v" id="rNP">—</p><p class="s d-only" id="sNP"></p></div>
         </div>
       </div>
       <div class="verdict info" id="rVerdict"><span class="v-ico" aria-hidden="true" id="rVerdictI">–</span><span class="v-txt"><span class="v-t" id="rVerdictT">—</span><span class="v-d" id="rVerdictD"></span></span></div>
@@ -404,9 +440,10 @@ html.embedded .hero-in{padding-block:28px 32px}
     </div>
 
     <div class="legal">
-      <p id="legalNorms"><b>Normativa:</b> Ley 15/2009, art. 38 · Orden FOM/1882/2012, condición 3.4 · Real Decreto-ley 9/2026 (desde el 16/04/2026) · Real Decreto-ley 18/2026 (desde el 01/07/2026).</p>
-      <p id="legalShort"><b>Resultado orientativo.</b> Depende de los datos introducidos y Grupo Trimodos no se hace responsable de las decisiones que se tomen a partir de él. Para una reclamación o un litigio, contrástalo con la calculadora oficial del Ministerio de Transportes y Movilidad Sostenible.</p>
-      <p id="srcTxt">Precios: evolución semanal del gasóleo de automoción en España publicada por el Ministerio de Transportes y Movilidad Sostenible.</p>
+      <p class="d-only" id="legalNorms"><b>Normativa:</b> Ley 15/2009, art. 38 · Orden FOM/1882/2012, condición 3.4 · Real Decreto-ley 9/2026 (desde el 16/04/2026) · Real Decreto-ley 18/2026 (desde el 01/07/2026).</p>
+      <p class="d-only" id="legalShort"><b>Resultado orientativo.</b> Depende de los datos introducidos y Grupo Trimodos no se hace responsable de las decisiones que se tomen a partir de él. Para una reclamación o un litigio, contrástalo con la calculadora oficial del Ministerio de Transportes y Movilidad Sostenible.</p>
+      <p class="d-only" id="srcTxt">Precios: evolución semanal del gasóleo de automoción en España publicada por el Ministerio de Transportes y Movilidad Sostenible.</p>
+      <p class="m-only" id="legalM"><b>Resultado orientativo.</b> Grupo Trimodos no se hace responsable de las decisiones que se tomen a partir de él. Ley 15/2009, art. 38 · Precios del Ministerio de Transportes.</p>
     </div>
   </section>
 </main>
@@ -520,7 +557,7 @@ const TX={
 // "@aria:" cambia el aria-label en lugar del contenido.
 const STATIC_EN=[
  ["#skipLink","Skip to content"],
- ["#hTitle","Diesel price revision calculator for haulage"],
+ ["#hTitle","<span class=\"d-only\">Diesel price revision calculator for haulage</span><span class=\"m-only\">Diesel price revision</span>"],
  ["#hLede","Work out how much the price of a road haulage job should change when diesel goes up or down. By law (Spanish Law 15/2009, art. 38), the price is revised when diesel changes by 5% or more between the contract date and the date of carriage."],
  ["#lblUpdated","Official prices updated to:"],["#hData","Calculation details"],
  ["#tagRef","Reference"],["#hRef","Contract date"],["#helpRef","Diesel price when the haulage price was agreed."],
@@ -532,7 +569,7 @@ const STATIC_EN=[
  ["#veh option[value=A]","A · MAM ≥ 20,000 kg (except construction)"],["#veh option[value=B]","B · MAM 3,500–20,000 kg (except construction)"],
  ["#veh option[value=C]","C · Construction vehicles, MAM &gt; 3,500 kg"],["#veh option[value=D]","D · MAM ≤ 3,500 kg"],
  ["label[for=price]","Agreed haulage price (€)"],
- ["#gpTxt","Vehicle with MAM ≥ 7.5 t (eligible for professional diesel refund)"],["#contTxt","Continuous haulage contract (revised at each billing period)"],
+ ["#gpTxt","Vehicle with MAM ≥ 7.5 t<span class=\"d-only\"> (eligible for professional diesel refund)</span>"],["#contTxt","Continuous haulage contract<span class=\"d-only\"> (revised at each billing period)</span>"],
  ["#hRes","Result"],["#kPct","Change in haulage price"],["#kDP","Amount to revise"],["#kNP","New price"],["#kG","Change in diesel price (G)"],["#kC","Coefficient C"],
  ["#btnShareTxt","Share result"],["#hMore","More information"],
  ["#advT","Advanced options"],["#advBadge","Changed"],["#advHint","Price used for G, threshold, rounding and coefficient C"],
@@ -554,6 +591,7 @@ const STATIC_EN=[
  ["#legalNorms","<b>Legislation:</b> Law 15/2009, art. 38 · Order FOM/1882/2012, condition 3.4 · Royal Decree-law 9/2026 (from 16/04/2026) · Royal Decree-law 18/2026 (from 01/07/2026)."],
  ["#legalShort","<b>For guidance only.</b> The result depends on the data entered and Grupo Trimodos accepts no liability for decisions taken on the basis of it. For a claim or dispute, check it against the official calculator of the Spanish Ministry of Transport and Sustainable Mobility."],
  ["#srcTxt","Prices: weekly automotive diesel prices in Spain published by the Spanish Ministry of Transport and Sustainable Mobility."],
+ ["#legalM","<b>For guidance only.</b> Grupo Trimodos accepts no liability for decisions taken on the basis of this result. Law 15/2009, art. 38 · Prices from the Spanish Ministry of Transport."],
  ["#fAbout","We are a transport and logistics company specialising in intermodal transport. After more than 40 years of experience, we keep working towards the same goal: helping businesses optimise their logistics networks efficiently, closely and honestly."],
  ["#fTalkT","Let’s talk"]
 ];
@@ -749,6 +787,12 @@ function weeksText(sel,spec){
   const usados=sel.days-sel.missing;
   return L.wNat(mes,usados,sel.items.map(i=>fmtDate(i.row.ms).slice(0,5)+" ("+L.dd(i.w)+")").join(", "))+(sel.missing?L.wNatPartial(sel.missing):"");
 }
+// Versión corta para el móvil: una línea con lo esencial. Los avisos (falta el precio) se muestran enteros.
+function weeksShort(sel,spec){
+  if(spec.mode==="manual")return sel.manual!=null?"":L.wManualNo;
+  if(!sel.items.length)return weeksText(sel,spec);
+  return specDetail(rowsOf(sel),spec)+(spec.mode==="nat"&&sel.missing?L.wNatPartial(sel.missing):"");
+}
 
 let LAST={},liveT=0;
 function calc(){
@@ -761,8 +805,9 @@ function calc(){
   const r={v:valueOf(sr,basis,ge)},t={v:valueOf(st,basis,ge)};
   $("refVal").textContent=nf(r.v,5);$("realVal").textContent=nf(t.v,5);
   $("refWeeks").textContent=weeksText(sr,S.ref);$("realWeeks").textContent=weeksText(st,S.real);
+  $("refWeeksS").textContent=weeksShort(sr,S.ref);$("realWeeksS").textContent=weeksShort(st,S.real);
   const lastData=lastRow().ms;
-  if(S.real.mode==="month"&&isFinite(tEnd)&&tEnd>lastData+6*DAY&&wt.length)$("realWeeks").textContent+=L.wIncomplete;
+  if(S.real.mode==="month"&&isFinite(tEnd)&&tEnd>lastData+6*DAY&&wt.length){$("realWeeks").textContent+=L.wIncomplete;$("realWeeksS").textContent+=L.wIncomplete}
 
   // C
   let C=null,cNote="";
